@@ -1,32 +1,34 @@
 package game;
 
 import java.util.ArrayList;
+import java.util.Random;
 
 public class Board {
 
-    private static int[][] board = new int[8][8];
+    private int[][] board = new int[8][8];
+    public int currentPlayer;
     private static final int EMPTY = 0;
     private static final int RED = 1;
     private static final int BLACK = 2;
-    private static final int BLACK_KING = 3;
-    private static final int RED_KING = 4;
+    private static final int RED_KING = 3;
+    private static final int BLACK_KING = 4;
 
     public Board() {
         setupGame();
     }
 
     public static void main(String[] args) {
-        Board board = new Board();
-        Move move = new Move(0, 0, 4, 4);
-        Move redmove = new Move(5, 3, 0, 0);
-        board.makeMove(move);
-        board.makeMove(redmove);
-        board.printBoard();
-        board.getLegalMoves(BLACK);
-        ArrayList<Move> availableMoves = board.getLegalMoves(BLACK);
-        for (Move m : availableMoves) {
-            System.out.println(m.toString());
-        }
+//        Board board = new Board();
+//        Move move = new Move(0, 0, 4, 4);
+//        Move redmove = new Move(5, 3, 0, 0);
+//        board.makeMove(move);
+//        board.makeMove(redmove);
+//        board.printBoard();
+//        board.getLegalMoves(BLACK);
+//        ArrayList<Move> availableMoves = board.getLegalMoves(BLACK);
+//        for (Move m : availableMoves) {
+//            System.out.println(m.toString());
+//        }
     }
 
     public void makeMove(Move move) {
@@ -101,7 +103,20 @@ public class Board {
         } else return !(rowTo < rowFrom && board[rowFrom][columnFrom] == BLACK);
     }
 
-    private static void setupGame() {
+    public boolean isLegalMove(int player, Move move) {
+
+        if (move.toRow < 0 || move.toRow >= 8 || move.toColumn < 0 || move.toColumn >= 8) {
+            return false;
+        }
+        if (board[move.toRow][move.toColumn] != EMPTY) {
+            return false;
+        }
+        if (player == RED) {
+            return !(move.toRow > move.fromRow && board[move.fromRow][move.fromColumn] == RED);
+        } else return !(move.toRow < move.fromRow && board[move.fromRow][move.fromColumn] == BLACK);
+    }
+
+    public void setupGame() {
         for (int row = 0; row < 8; row++) {
             for (int col = 0; col < 8; col++) {
                 if ( row % 2 == col % 2 ) {
@@ -117,12 +132,15 @@ public class Board {
                 }
             }
         }
+        Random r = new Random();
+        this.currentPlayer = r.nextInt(2) + 1;
     }
 
     public void printBoard() {
         for (int i = 0; i < 8; i++) {
             for (int j = 0; j < 8; j++) {
                 System.out.print(board[i][j]);
+                System.out.print("   ");
             }
             System.out.print("\n");
         }
