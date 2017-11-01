@@ -2,10 +2,10 @@ package game;
 
 public class Move {
 
-    private int fromRow;
-    private int fromColumn;
-    private int toRow;
-    private int toColumn;
+    int fromRow;
+    int fromColumn;
+    int toRow;
+    int toColumn;
 
     Move (int fromRow, int fromColumn, int toRow, int toColumn) {
         this.fromRow = fromRow;

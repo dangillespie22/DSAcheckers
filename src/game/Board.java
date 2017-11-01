@@ -17,9 +17,30 @@ public class Board {
 
     public static void main(String[] args) {
         Board board = new Board();
+        Move move = new Move(0, 0, 4, 4);
+        Move redmove = new Move(5, 3, 0, 0);
+        board.makeMove(move);
+        board.makeMove(redmove);
+        board.printBoard();
+        board.getLegalMoves(BLACK);
         ArrayList<Move> availableMoves = board.getLegalMoves(BLACK);
         for (Move m : availableMoves) {
             System.out.println(m.toString());
+        }
+    }
+
+    public void makeMove(Move move) {
+        board[move.toRow][move.toColumn] = board[move.fromRow][move.fromColumn];
+        board[move.fromRow][move.fromColumn] = EMPTY;
+        if (move.fromRow - move.fromColumn == 2 || move.fromRow - move.toRow == -2) {
+            int jumpRow = (move.fromRow + move.toRow) / 2;
+            int jumpCol = (move.fromColumn + move.toColumn) / 2;
+            board[jumpRow][jumpCol] = EMPTY;
+        }
+        if (move.toRow == 0 && board[move.toRow][move.toColumn] == RED) {
+            board[move.toRow][move.toColumn] = RED_KING;
+        } else if (move.toRow == 7 && board[move.toRow][move.toColumn] == BLACK) {
+            board[move.toRow][move.toColumn] = BLACK_KING;
         }
     }
 
@@ -98,7 +119,7 @@ public class Board {
         }
     }
 
-    private static void printBoard() {
+    public void printBoard() {
         for (int i = 0; i < 8; i++) {
             for (int j = 0; j < 8; j++) {
                 System.out.print(board[i][j]);
