@@ -17,6 +17,10 @@ public class Board {
         setupGame();
     }
 
+    public int getCurrentPlayer() {
+        return currentPlayer;
+    }
+
     public static void main(String[] args) {
 //        Board board = new Board();
 //        Move move = new Move(0, 0, 4, 4);
@@ -29,6 +33,10 @@ public class Board {
 //        for (Move m : availableMoves) {
 //            System.out.println(m.toString());
 //        }
+    }
+
+    public int[][] getBoard() {
+        return board;
     }
 
     public void makeMove(Move move) {
@@ -44,6 +52,7 @@ public class Board {
         } else if (move.toRow == 7 && board[move.toRow][move.toColumn] == BLACK) {
             board[move.toRow][move.toColumn] = BLACK_KING;
         }
+        currentPlayer = currentPlayer == 1 ? 2 : 1;
     }
 
     public ArrayList<Move> getLegalMoves(int player) {
@@ -98,9 +107,12 @@ public class Board {
         if (board[rowTo][columnTo] != EMPTY) {
             return false;
         }
-        if (player == RED) {
+        if (player == RED && currentPlayer == RED) {
             return !(rowTo > rowFrom && board[rowFrom][columnFrom] == RED);
-        } else return !(rowTo < rowFrom && board[rowFrom][columnFrom] == BLACK);
+        } else if (player == BLACK && currentPlayer == BLACK) {
+            return !(rowTo < rowFrom && board[rowFrom][columnFrom] == BLACK);
+        }
+        return false;
     }
 
     public boolean isLegalMove(int player, Move move) {
@@ -111,9 +123,12 @@ public class Board {
         if (board[move.toRow][move.toColumn] != EMPTY) {
             return false;
         }
-        if (player == RED) {
+        if (player == RED && currentPlayer == RED) {
             return !(move.toRow > move.fromRow && board[move.fromRow][move.fromColumn] == RED);
-        } else return !(move.toRow < move.fromRow && board[move.fromRow][move.fromColumn] == BLACK);
+        } else if (player == BLACK && currentPlayer == BLACK) {
+            return !(move.toRow < move.fromRow && board[move.fromRow][move.fromColumn] == BLACK);
+        }
+        return false;
     }
 
     public void setupGame() {

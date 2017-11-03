@@ -7,7 +7,7 @@ public class Move {
     int toRow;
     int toColumn;
 
-    Move (int fromRow, int fromColumn, int toRow, int toColumn) {
+    public Move (int fromRow, int fromColumn, int toRow, int toColumn) {
         this.fromRow = fromRow;
         this.fromColumn = fromColumn;
         this.toRow = toRow;
