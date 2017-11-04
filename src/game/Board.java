@@ -6,7 +6,14 @@ import java.util.Random;
 public class Board {
 
     private int[][] board = new int[8][8];
-    public int currentPlayer;
+    private int currentPlayer;
+    private int totalTurns;
+    private int redTurns;
+    private int blackTurns;
+    private int redPieces;
+    private int blackPieces;
+    private int redKingPieces;
+    private int blackKingPieces;
     private static final int EMPTY = 0;
     private static final int RED = 1;
     private static final int BLACK = 2;
@@ -14,32 +21,26 @@ public class Board {
     private static final int BLACK_KING = 4;
 
     public Board() {
+        totalTurns = 1;
+        redTurns = 0;
+        blackTurns = 0;
+        redPieces = 0;
+        blackPieces = 0;
+        redKingPieces = 0;
+        blackKingPieces = 0;
         setupGame();
+        calculateBoardConditions();
     }
 
     public int getCurrentPlayer() {
         return currentPlayer;
     }
 
-    public static void main(String[] args) {
-//        Board board = new Board();
-//        Move move = new Move(0, 0, 4, 4);
-//        Move redmove = new Move(5, 3, 0, 0);
-//        board.makeMove(move);
-//        board.makeMove(redmove);
-//        board.printBoard();
-//        board.getLegalMoves(BLACK);
-//        ArrayList<Move> availableMoves = board.getLegalMoves(BLACK);
-//        for (Move m : availableMoves) {
-//            System.out.println(m.toString());
-//        }
-    }
-
     public int[][] getBoard() {
         return board;
     }
 
-    public void makeMove(Move move) {
+    public int makeMove(Move move) {
         board[move.toRow][move.toColumn] = board[move.fromRow][move.fromColumn];
         board[move.fromRow][move.fromColumn] = EMPTY;
         if (move.fromRow - move.fromColumn == 2 || move.fromRow - move.toRow == -2) {
@@ -52,7 +53,48 @@ public class Board {
         } else if (move.toRow == 7 && board[move.toRow][move.toColumn] == BLACK) {
             board[move.toRow][move.toColumn] = BLACK_KING;
         }
-        currentPlayer = currentPlayer == 1 ? 2 : 1;
+        totalTurns++;
+        int state = calculateBoardConditions();
+        if (currentPlayer == RED && state == 0) {
+            redTurns++;
+            currentPlayer = BLACK;
+        } else if (currentPlayer == BLACK && state == 0) {
+            blackTurns++;
+            currentPlayer = RED;
+        }
+        return state;
+    }
+
+    private int calculateBoardConditions() {
+        this.redPieces = 0;
+        this.blackPieces = 0;
+        this.redKingPieces = 0;
+        this.blackKingPieces = 0;
+
+        for (int r = 0; r < 8; r++) {
+            for (int c = 0; c < 8; c++) {
+                switch(board[r][c]) {
+                    case RED:
+                        redPieces++;
+                        break;
+                    case BLACK:
+                        blackPieces++;
+                        break;
+                    case RED_KING:
+                        redKingPieces++;
+                        break;
+                    case BLACK_KING:
+                        blackKingPieces++;
+                        break;
+                }
+            }
+        }
+        if (redPieces == 0 && redKingPieces == 0) {
+            return BLACK;
+        } else if (blackPieces == 0 && blackKingPieces == 0) {
+            return RED;
+        }
+        return 0;
     }
 
     public ArrayList<Move> getLegalMoves(int player) {
@@ -151,6 +193,10 @@ public class Board {
         this.currentPlayer = r.nextInt(2) + 1;
     }
 
+    public int getTotalTurns() {
+        return totalTurns;
+    }
+
     public void printBoard() {
         for (int i = 0; i < 8; i++) {
             for (int j = 0; j < 8; j++) {
@@ -159,5 +205,7 @@ public class Board {
             }
             System.out.print("\n");
         }
+        System.out.println("Red pieces: " + redPieces);
+        System.out.println("Black pieces: " + blackPieces);
     }
 }

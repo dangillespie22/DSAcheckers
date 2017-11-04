@@ -3,11 +3,8 @@ package ui;
 import game.Board;
 import game.Move;
 import javafx.application.Application;
-import javafx.event.ActionEvent;
-import javafx.event.EventHandler;
 import javafx.geometry.*;
 import javafx.scene.*;
-import javafx.scene.control.Button;
 import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.*;
@@ -26,15 +23,15 @@ public class SplashPage extends Application {
     private Circle[] redPieces = new Circle[12];
     private Circle[] blackPieces = new Circle[12];
     private GridPane gameBoard = new GridPane();
-    private Board board;
+    private Board currentBoard;
 
     public static void main(String[] args) {
         launch(args);
     }
 
     public void start(Stage primaryStage) {
-        this.board = new Board();
-        board.printBoard();
+        this.currentBoard = new Board();
+        currentBoard.printBoard();
         paintBoard();
         gameBoard.setPadding(new Insets(15, 15, 15, 15));
         Scene scene = new Scene(gameBoard, 700, 700);
@@ -48,7 +45,9 @@ public class SplashPage extends Application {
         buildBoard();
         drawSquares();
         drawPieces();
-        System.out.println("Current player: " + (board.currentPlayer == RED ? "RED" : "BLACK"));
+        System.out.println("Turn: " + currentBoard.getTotalTurns());
+        System.out.println("Current player: " + (currentBoard.getCurrentPlayer() == RED ? "RED" : "BLACK"));
+        currentBoard.printBoard();
     }
 
     private void buildBoard() {
@@ -80,16 +79,22 @@ public class SplashPage extends Application {
                     if (selectedPiece != null) {
                         System.out.println(gameBoard.getRowIndex(selectedPiece) + ", " + gameBoard.getColumnIndex(selectedPiece));
                         Move move = new Move(gameBoard.getRowIndex(selectedPiece), gameBoard.getColumnIndex(selectedPiece), row, column);
-                        if (board.isLegalMove(board.getCurrentPlayer(), move)) {
-                            board.makeMove(move);
+                        if (currentBoard.isLegalMove(currentBoard.getCurrentPlayer(), move)) {
+                            int state = currentBoard.makeMove(move);
                             paintBoard();
+                            if (state != 0) {
+                                calculateWinner(state);
+                            }
                         }
                     }
-                    System.out.println("Current location: [" + row + ", " + column + "]");
                 });
                 gameBoard.add(rect, j, i);
             }
         }
+    }
+
+    public void calculateWinner(int winner) {
+        System.out.println("The winner is " + (winner == RED ? "RED" : "BLACK"));
     }
 
     public void resetPieceColours() {
@@ -106,33 +111,27 @@ public class SplashPage extends Application {
         int blackCounter = 0;
         for (int i = 0; i < 8; i++) {
             for (int j = 0; j < 8; j++) {
-                if (board.getBoard()[i][j] == RED) {
+                if (currentBoard.getBoard()[i][j] == RED) {
                     final Circle piece = new Circle(SQUARES / 2 - 4, RED_COLOUR);
                     redPieces[redCounter] = piece;
                     redPieces[redCounter].setStroke(Color.BLACK);
                     gameBoard.add(piece, j, i);
-                    final int row = i;
-                    final int column = j;
                     piece.setOnMouseClicked(event -> {
                         resetPieceColours();
                         this.selectedPiece = piece;
                         piece.setFill(Color.MAROON);
-                        System.out.println("Current location: [" + row + ", " + column + "]");
                     });
                     redCounter++;
                 }
-                else if (board.getBoard()[i][j] == BLACK) {
+                else if (currentBoard.getBoard()[i][j] == BLACK) {
                     final Circle piece = new Circle(SQUARES / 2 - 4, BLACK_COLOUR);
                     blackPieces[blackCounter] = piece;
                     blackPieces[blackCounter].setStroke(Color.BLACK);
                     gameBoard.add(blackPieces[blackCounter], j, i);
-                    final int row = i;
-                    final int column = j;
                     blackPieces[blackCounter].setOnMouseClicked(event -> {
                         resetPieceColours();
                         this.selectedPiece = piece;
                         piece.setFill(Color.MAROON);
-                        System.out.println("Current location: [" + row + ", " + column + "]");
                     });
                     blackCounter++;
                 }
