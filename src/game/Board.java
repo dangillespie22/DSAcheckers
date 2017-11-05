@@ -44,6 +44,7 @@ public class Board {
         board[move.toRow][move.toColumn] = board[move.fromRow][move.fromColumn];
         board[move.fromRow][move.fromColumn] = EMPTY;
         if (move.fromRow - move.fromColumn == 2 || move.fromRow - move.toRow == -2) {
+            System.out.println("called");
             int jumpRow = (move.fromRow + move.toRow) / 2;
             int jumpCol = (move.fromColumn + move.toColumn) / 2;
             board[jumpRow][jumpCol] = EMPTY;
@@ -129,16 +130,18 @@ public class Board {
             return false;
         }
         if (player == RED) {
-            if (rowTo > rowFrom && board[rowFrom][columnFrom] == RED) {
+            if (rowFrom > rowTo && board[rowFrom][columnFrom] == RED) {
                 return false;
             }
-            return !(board[rowCenter][columnCenter] != BLACK || board[rowCenter][columnCenter] != BLACK_KING);
-        } else {
-            if (rowTo > rowFrom && board[rowFrom][columnFrom] == BLACK) {
-                return false;
-            }
-            return !(board[rowCenter][columnCenter] != RED || board[rowCenter][columnCenter] != RED_KING);
+            return !(board[rowCenter][columnCenter] != BLACK && board[rowCenter][columnCenter] != BLACK_KING);
         }
+        else if (player == BLACK) {
+            if (rowFrom > rowTo && board[rowFrom][columnFrom] == BLACK) {
+                return false;
+            }
+            return !(board[rowCenter][columnCenter] != RED && board[rowCenter][columnCenter] != RED_KING);
+        }
+        return false;
     }
 
     public boolean isLegalMove(int player, int rowFrom, int columnFrom, int rowTo, int columnTo) {
@@ -159,18 +162,22 @@ public class Board {
 
     public boolean isLegalMove(int player, Move move) {
 
-        if (move.toRow < 0 || move.toRow >= 8 || move.toColumn < 0 || move.toColumn >= 8) {
-            return false;
+        if (move.toRow < 0 || move.toRow >= 8 || move.toColumn < 0 || move.toColumn >= 8)
+            return false;  // (r2,c2) is off the board.
+
+        if (board[move.toRow][move.toColumn] != EMPTY)
+            return false;  // (r2,c2) already contains a piece.
+
+        if (player == RED) {
+            if (board[move.fromRow][move.fromColumn] == RED && move.toRow > move.fromRow)
+                return false;  // Regular red piece can only move down.
+            return true;  // The move is legal.
         }
-        if (board[move.toRow][move.toColumn] != EMPTY) {
-            return false;
+        else {
+            if (board[move.fromRow][move.fromColumn] == BLACK && move.toRow < move.fromRow)
+                return false;  // Regular black piece can only move up.
+            return true;  // The move is legal.
         }
-        if (player == RED && currentPlayer == RED) {
-            return !(move.toRow > move.fromRow && board[move.fromRow][move.fromColumn] == RED);
-        } else if (player == BLACK && currentPlayer == BLACK) {
-            return !(move.toRow < move.fromRow && board[move.fromRow][move.fromColumn] == BLACK);
-        }
-        return false;
     }
 
     public void setupGame() {

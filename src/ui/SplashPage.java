@@ -10,6 +10,8 @@ import javafx.scene.paint.Color;
 import javafx.scene.shape.*;
 import javafx.stage.Stage;
 
+import java.util.ArrayList;
+
 public class SplashPage extends Application {
     private static final int BOARD_DIM = 8;
     private static final int SQUARES = 64;
@@ -117,9 +119,11 @@ public class SplashPage extends Application {
                     redPieces[redCounter].setStroke(Color.BLACK);
                     gameBoard.add(piece, j, i);
                     piece.setOnMouseClicked(event -> {
-                        resetPieceColours();
-                        this.selectedPiece = piece;
-                        piece.setFill(Color.MAROON);
+                        if (currentBoard.getCurrentPlayer() == RED) {
+                            resetPieceColours();
+                            this.selectedPiece = piece;
+                            piece.setFill(Color.MAROON);
+                        }
                     });
                     redCounter++;
                 }
@@ -129,9 +133,11 @@ public class SplashPage extends Application {
                     blackPieces[blackCounter].setStroke(Color.BLACK);
                     gameBoard.add(blackPieces[blackCounter], j, i);
                     blackPieces[blackCounter].setOnMouseClicked(event -> {
-                        resetPieceColours();
-                        this.selectedPiece = piece;
-                        piece.setFill(Color.MAROON);
+                        if (currentBoard.getCurrentPlayer() == BLACK) {
+                            resetPieceColours();
+                            this.selectedPiece = piece;
+                            piece.setFill(Color.MAROON);
+                        }
                     });
                     blackCounter++;
                 }
