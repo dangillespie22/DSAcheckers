@@ -33,17 +33,15 @@ public class SplashPage extends Application {
 
     public void start(Stage primaryStage) {
         this.currentBoard = new Board();
-        currentBoard.printBoard();
         paintBoard();
         gameBoard.setPadding(new Insets(15, 15, 15, 15));
         Scene scene = new Scene(gameBoard, 700, 700);
         primaryStage.setTitle("Checkers");
         primaryStage.setScene(scene);
         primaryStage.show();
-        System.out.println(primaryStage.getWidth());
     }
 
-    public void paintBoard() {
+    private void paintBoard() {
         buildBoard();
         drawSquares();
         drawPieces();
@@ -79,9 +77,9 @@ public class SplashPage extends Application {
                 final int column = j;
                 rect.setOnMouseClicked(event -> {
                     if (selectedPiece != null) {
-                        System.out.println(gameBoard.getRowIndex(selectedPiece) + ", " + gameBoard.getColumnIndex(selectedPiece));
-                        Move move = new Move(gameBoard.getRowIndex(selectedPiece), gameBoard.getColumnIndex(selectedPiece), row, column);
-                        if (currentBoard.isLegalMove(currentBoard.getCurrentPlayer(), move)) {
+                        Move move = new Move(GridPane.getRowIndex(selectedPiece), GridPane.getColumnIndex(selectedPiece), row, column);
+                        ArrayList<Move> legalMoves = currentBoard.getLegalMoves(currentBoard.getCurrentPlayer());
+                        if (legalMoves.contains(move)) {
                             int state = currentBoard.makeMove(move);
                             paintBoard();
                             if (state != 0) {
@@ -95,11 +93,11 @@ public class SplashPage extends Application {
         }
     }
 
-    public void calculateWinner(int winner) {
+    private void calculateWinner(int winner) {
         System.out.println("The winner is " + (winner == RED ? "RED" : "BLACK"));
     }
 
-    public void resetPieceColours() {
+    private void resetPieceColours() {
         for (Circle c : redPieces) {
             c.setFill(RED_COLOUR);
         }
@@ -127,10 +125,40 @@ public class SplashPage extends Application {
                     });
                     redCounter++;
                 }
+                else if (currentBoard.getBoard()[i][j] == RED_KING) {
+                    final Circle piece = new Circle(SQUARES / 2 - 4, RED_COLOUR);
+                    redPieces[redCounter] = piece;
+                    redPieces[redCounter].setStroke(Color.RED);
+                    redPieces[redCounter].setStrokeWidth(5);
+                    gameBoard.add(piece, j, i);
+                    piece.setOnMouseClicked(event -> {
+                        if (currentBoard.getCurrentPlayer() == RED) {
+                            resetPieceColours();
+                            this.selectedPiece = piece;
+                            piece.setFill(Color.MAROON);
+                        }
+                    });
+                    redCounter++;
+                }
                 else if (currentBoard.getBoard()[i][j] == BLACK) {
                     final Circle piece = new Circle(SQUARES / 2 - 4, BLACK_COLOUR);
                     blackPieces[blackCounter] = piece;
                     blackPieces[blackCounter].setStroke(Color.BLACK);
+                    gameBoard.add(blackPieces[blackCounter], j, i);
+                    blackPieces[blackCounter].setOnMouseClicked(event -> {
+                        if (currentBoard.getCurrentPlayer() == BLACK) {
+                            resetPieceColours();
+                            this.selectedPiece = piece;
+                            piece.setFill(Color.MAROON);
+                        }
+                    });
+                    blackCounter++;
+                }
+                else if (currentBoard.getBoard()[i][j] == BLACK_KING) {
+                    final Circle piece = new Circle(SQUARES / 2 - 4, BLACK_COLOUR);
+                    blackPieces[blackCounter] = piece;
+                    blackPieces[blackCounter].setStroke(Color.RED);
+                    blackPieces[blackCounter].setStrokeWidth(5);
                     gameBoard.add(blackPieces[blackCounter], j, i);
                     blackPieces[blackCounter].setOnMouseClicked(event -> {
                         if (currentBoard.getCurrentPlayer() == BLACK) {
