@@ -1,0 +1,53 @@
+.button {
+    -fx-background-color: saddlebrown;
+    -fx-text-fill: lightsalmon;
+    -fx-font-weight: bold;
+}
+
+.layout {
+    -fx-padding: 15 30 30 30;
+    -fx-background-color: lightsalmon;
+}
+
+.turnText {
+    -fx-font-family: verdana;
+    -fx-font-weight: bold;
+    -fx-font-size: 40;
+    -fx-fill: saddlebrown;
+}
+
+.infoText {
+    -fx-font-family: verdana;
+    -fx-font-weight: bold;
+    -fx-font-size: 20;
+    -fx-fill: saddlebrown;
+}
+
+.textWhite {
+    -fx-font-family: verdana;
+    -fx-font-weight: bold;
+    -fx-font-size: 40;
+    -fx-fill: white;
+}
+
+.textBlack {
+    -fx-font-family: verdana;
+    -fx-font-weight: bold;
+    -fx-font-size: 40;
+    -fx-fill: black;
+}
+
+.gameBoard {
+    -fx-border-style: solid inside;
+    -fx-border-width: 5;
+    -fx-border-insets: 5;
+    -fx-border-radius: 2;
+    -fx-background-color: saddlebrown;
+    -fx-padding: 15;
+}
+
+.top {
+    -fx-padding: 0 0 15 0;
+}
+
+

@@ -2,16 +2,29 @@ package game;
 
 public class Move {
 
+    int player;
     int fromRow;
     int fromColumn;
     int targetRow;
     int targetColumn;
+    boolean isCapture;
 
-    public Move (int fromRow, int fromColumn, int targetRow, int targetColumn) {
+    public Move (int player, int fromRow, int fromColumn, int targetRow, int targetColumn) {
+        this.player = player;
         this.fromRow = fromRow;
         this.fromColumn = fromColumn;
         this.targetRow = targetRow;
         this.targetColumn = targetColumn;
+        this.isCapture = false;
+    }
+
+    public Move (int player, int fromRow, int fromColumn, int targetRow, int targetColumn, boolean isCapture) {
+        this.player = player;
+        this.fromRow = fromRow;
+        this.fromColumn = fromColumn;
+        this.targetRow = targetRow;
+        this.targetColumn = targetColumn;
+        this.isCapture = isCapture;
     }
 
     @Override
@@ -26,6 +39,6 @@ public class Move {
 
     @Override
     public String toString () {
-       return "[" + fromRow + ", " + fromColumn + "] -> [" + targetRow + ", " + targetColumn + "]";
+       return "Player " + (player == 1 ? "White" : "Black") + " - [" + fromRow + ", " + fromColumn + "] -> [" + targetRow + ", " + targetColumn + "]";
     }
 }

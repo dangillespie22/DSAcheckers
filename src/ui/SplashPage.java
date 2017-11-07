@@ -5,9 +5,11 @@ import game.Move;
 import javafx.application.Application;
 import javafx.geometry.*;
 import javafx.scene.*;
+import javafx.scene.control.Button;
 import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.*;
+import javafx.scene.text.Text;
 import javafx.stage.Stage;
 
 import java.util.ArrayList;
@@ -15,16 +17,19 @@ import java.util.ArrayList;
 public class SplashPage extends Application {
     private static final int BOARD_DIM = 8;
     private static final int SQUARES = 64;
-    private static final Color RED_COLOUR = Color.WHITE;
+    private static final Color WHITE_COLOUR = Color.WHITE;
     private static final Color BLACK_COLOUR = Color.BLACK;
-    private static final int RED = 1;
+    private static final int WHITE = 1;
     private static final int BLACK = 2;
-    private static final int RED_KING = 3;
+    private static final int WHITE_KING = 3;
     private static final int BLACK_KING = 4;
     private Circle selectedPiece = null;
-    private Circle[] redPieces = new Circle[12];
+    private Circle[] whitePieces = new Circle[12];
     private Circle[] blackPieces = new Circle[12];
     private GridPane gameBoard = new GridPane();
+    private BorderPane layout = new BorderPane();
+    private ArrayList<Board> gameStates;
+    private ArrayList<Board> gameStatesRedo;
     private Board currentBoard;
 
     public static void main(String[] args) {
@@ -32,22 +37,49 @@ public class SplashPage extends Application {
     }
 
     public void start(Stage primaryStage) {
+        gameStates = new ArrayList<>();
+        gameStatesRedo = new ArrayList<>();
         this.currentBoard = new Board();
         paintBoard();
-        gameBoard.setPadding(new Insets(15, 15, 15, 15));
-        Scene scene = new Scene(gameBoard, 700, 700);
+        Scene scene = new Scene(layout);
+        scene.getStylesheets().add("game/style.css");
         primaryStage.setTitle("Checkers");
         primaryStage.setScene(scene);
         primaryStage.show();
+    }
+
+    private void restartGame() {
+        this.currentBoard = new Board();
+        gameStates.add(currentBoard.cloneBoard());
+        gameStates = new ArrayList<>();
+        gameStatesRedo = new ArrayList<>();
+        paintBoard();
+    }
+
+    private void backOneTurn() {
+
+        gameStatesRedo.add(0, gameStates.get(gameStates.size()-1).cloneBoard());
+        this.currentBoard = gameStates.get(gameStates.size()-1);
+        gameStates.remove(gameStates.size()-1);
+        paintBoard();
+    }
+
+    private void forwardOneTurn() {
+
+        gameStates.add(gameStatesRedo.get(0).cloneBoard());
+        this.currentBoard = gameStatesRedo.get(0);
+        gameStatesRedo.remove(0);
+        paintBoard();
     }
 
     private void paintBoard() {
         buildBoard();
         drawSquares();
         drawPieces();
-        System.out.println("Turn: " + currentBoard.getTotalTurns());
-        System.out.println("Current player: " + (currentBoard.getCurrentPlayer() == RED ? "RED" : "BLACK"));
-        currentBoard.printBoard();
+//        System.out.println("Turn: " + currentBoard.getTotalTurns());
+//        System.out.println("Current player: " + (currentBoard.getCurrentPlayer() == WHITE ? "WHITE" : "BLACK"));
+//        currentBoard.printBoard();
+        buildElements();
     }
 
     private void buildBoard() {
@@ -77,10 +109,12 @@ public class SplashPage extends Application {
                 final int column = j;
                 rect.setOnMouseClicked(event -> {
                     if (selectedPiece != null) {
-                        Move move = new Move(GridPane.getRowIndex(selectedPiece), GridPane.getColumnIndex(selectedPiece), row, column);
+                        Move move = new Move(currentBoard.getCurrentPlayer(), GridPane.getRowIndex(selectedPiece), GridPane.getColumnIndex(selectedPiece), row, column);
                         ArrayList<Move> legalMoves = currentBoard.getLegalMoves(currentBoard.getCurrentPlayer());
                         if (legalMoves.contains(move)) {
                             int state = currentBoard.makeMove(move);
+                            gameStates.add(currentBoard.cloneBoard());
+                            gameStatesRedo.clear();
                             paintBoard();
                             if (state != 0) {
                                 calculateWinner(state);
@@ -94,12 +128,13 @@ public class SplashPage extends Application {
     }
 
     private void calculateWinner(int winner) {
-        System.out.println("The winner is " + (winner == RED ? "RED" : "BLACK"));
+        System.out.println("The winner is " + (winner == WHITE ? "WHITE" : "BLACK"));
+        currentBoard.printGameDetails();
     }
 
     private void resetPieceColours() {
-        for (Circle c : redPieces) {
-            c.setFill(RED_COLOUR);
+        for (Circle c : whitePieces) {
+            c.setFill(WHITE_COLOUR);
         }
         for (Circle c : blackPieces) {
             c.setFill(BLACK_COLOUR);
@@ -107,38 +142,38 @@ public class SplashPage extends Application {
     }
 
     private void drawPieces() {
-        int redCounter = 0;
+        int whiteCounter = 0;
         int blackCounter = 0;
         for (int i = 0; i < 8; i++) {
             for (int j = 0; j < 8; j++) {
-                if (currentBoard.getBoard()[i][j] == RED) {
-                    final Circle piece = new Circle(SQUARES / 2 - 4, RED_COLOUR);
-                    redPieces[redCounter] = piece;
-                    redPieces[redCounter].setStroke(Color.BLACK);
+                if (currentBoard.getBoard()[i][j] == WHITE) {
+                    final Circle piece = new Circle(SQUARES / 2 - 4, WHITE_COLOUR);
+                    whitePieces[whiteCounter] = piece;
+                    whitePieces[whiteCounter].setStroke(Color.BLACK);
                     gameBoard.add(piece, j, i);
                     piece.setOnMouseClicked(event -> {
-                        if (currentBoard.getCurrentPlayer() == RED) {
+                        if (currentBoard.getCurrentPlayer() == WHITE) {
                             resetPieceColours();
                             this.selectedPiece = piece;
                             piece.setFill(Color.MAROON);
                         }
                     });
-                    redCounter++;
+                    whiteCounter++;
                 }
-                else if (currentBoard.getBoard()[i][j] == RED_KING) {
-                    final Circle piece = new Circle(SQUARES / 2 - 4, RED_COLOUR);
-                    redPieces[redCounter] = piece;
-                    redPieces[redCounter].setStroke(Color.RED);
-                    redPieces[redCounter].setStrokeWidth(5);
+                else if (currentBoard.getBoard()[i][j] == WHITE_KING) {
+                    final Circle piece = new Circle(SQUARES / 2 - 4, WHITE_COLOUR);
+                    whitePieces[whiteCounter] = piece;
+                    whitePieces[whiteCounter].setStroke(Color.SADDLEBROWN);
+                    whitePieces[whiteCounter].setStrokeWidth(5);
                     gameBoard.add(piece, j, i);
                     piece.setOnMouseClicked(event -> {
-                        if (currentBoard.getCurrentPlayer() == RED) {
+                        if (currentBoard.getCurrentPlayer() == WHITE) {
                             resetPieceColours();
                             this.selectedPiece = piece;
                             piece.setFill(Color.MAROON);
                         }
                     });
-                    redCounter++;
+                    whiteCounter++;
                 }
                 else if (currentBoard.getBoard()[i][j] == BLACK) {
                     final Circle piece = new Circle(SQUARES / 2 - 4, BLACK_COLOUR);
@@ -157,7 +192,7 @@ public class SplashPage extends Application {
                 else if (currentBoard.getBoard()[i][j] == BLACK_KING) {
                     final Circle piece = new Circle(SQUARES / 2 - 4, BLACK_COLOUR);
                     blackPieces[blackCounter] = piece;
-                    blackPieces[blackCounter].setStroke(Color.RED);
+                    blackPieces[blackCounter].setStroke(Color.SADDLEBROWN);
                     blackPieces[blackCounter].setStrokeWidth(5);
                     gameBoard.add(blackPieces[blackCounter], j, i);
                     blackPieces[blackCounter].setOnMouseClicked(event -> {
@@ -171,5 +206,80 @@ public class SplashPage extends Application {
                 }
             }
         }
+    }
+
+    private void buildElements() {
+
+        layout.getChildren().removeAll();
+        VBox gameInfo = new VBox();
+        HBox playerInfo = new HBox();
+        HBox turnInfo = new HBox();
+        VBox buttons = new VBox();
+        Button startPlayerVsPlayer = new Button();
+        Button startPlayerVsAI = new Button();
+        Button undo = new Button();
+        Button redo = new Button();
+        Button restartGame = new Button();
+
+
+        Text playerText = new Text("Current player: ");
+        Text currentPlayerText = new Text(currentBoard.getCurrentPlayer() == WHITE ? "White" : "Black");
+        Text currentTurn = new Text("Current turn: " + currentBoard.getTotalTurns());
+
+        restartGame.setOnMouseClicked(event -> {
+            restartGame();
+        });
+
+        undo.setOnMouseClicked(event -> {
+            if (!gameStates.isEmpty()) {
+                backOneTurn();
+            } else {
+                System.out.println("Make a turn if you wish to undo!");
+            }
+        });
+
+        redo.setOnMouseClicked(event -> {
+            if (!gameStatesRedo.isEmpty()) {
+                forwardOneTurn();
+            } else {
+                System.out.println("No forward moves!");
+            }
+        });
+
+        buttons.setPadding(new Insets(30, 0, 0, 0));
+        buttons.setPrefWidth(130);
+        buttons.setStyle("-fx-spacing: 5;");
+
+        startPlayerVsPlayer.setText("Start PvP Game");
+        startPlayerVsPlayer.setMinWidth(buttons.getPrefWidth()-15);
+        startPlayerVsAI.setText("Start PvAI Game");
+        startPlayerVsAI.setMinWidth(buttons.getPrefWidth()-15);
+        undo.setText("Undo last turn");
+        undo.setMinWidth(buttons.getPrefWidth()-15);
+        redo.setText("Redo last turn");
+        redo.setMinWidth(buttons.getPrefWidth()-15);
+        restartGame.setText("Restart Game");
+        restartGame.setMinWidth(buttons.getPrefWidth()-15);
+        gameBoard.setMinWidth(450);
+        gameBoard.setMinHeight(450);
+
+        undo.getStyleClass().add("button");
+        gameInfo.getStyleClass().add("top");
+        layout.getStyleClass().add("layout");
+        gameBoard.getStyleClass().add("gameBoard");
+        playerText.getStyleClass().add("turnText");
+        currentTurn.getStyleClass().add("infoText");
+        currentPlayerText.getStyleClass().add(currentBoard.getCurrentPlayer() == WHITE ? "textWhite" : "textBlack");
+        gameBoard.setStyle("-fx-border-color: " + (currentBoard.getCurrentPlayer() == WHITE ? "white" : "black"));
+
+
+        playerInfo.getChildren().addAll(playerText, currentPlayerText);
+        buttons.getChildren().addAll(startPlayerVsPlayer, startPlayerVsAI, restartGame, undo, redo);
+        turnInfo.getChildren().add(currentTurn);
+        gameInfo.getChildren().addAll(playerInfo, turnInfo);
+
+        layout.setLeft(buttons);
+        layout.setCenter(gameBoard);
+        layout.setTop(gameInfo);
     }
 }

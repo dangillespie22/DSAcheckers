@@ -6,29 +6,45 @@ import java.util.Random;
 public class Board {
 
     private int[][] board = new int[8][8];
+    private ArrayList<Move> moveSequence;
     private int currentPlayer;
     private int totalTurns;
-    private int redTurns;
+    private int whiteTurns;
     private int blackTurns;
-    private int redPieces;
+    private int whitePieces;
     private int blackPieces;
-    private int redKingPieces;
+    private int whiteKingPieces;
     private int blackKingPieces;
     private static final int EMPTY = 0;
-    private static final int RED = 1;
+    private static final int WHITE = 1;
     private static final int BLACK = 2;
-    private static final int RED_KING = 3;
+    private static final int WHITE_KING = 3;
     private static final int BLACK_KING = 4;
 
     public Board() {
+        moveSequence = new ArrayList<>();
         totalTurns = 1;
-        redTurns = 0;
+        whiteTurns = 0;
         blackTurns = 0;
-        redPieces = 0;
+        whitePieces = 0;
         blackPieces = 0;
-        redKingPieces = 0;
+        whiteKingPieces = 0;
         blackKingPieces = 0;
         setupGame();
+        calculateBoardConditions();
+    }
+
+    private Board(int[][] board, ArrayList<Move> moveSequence, int currentPlayer, int totalTurns) {
+        this.moveSequence = moveSequence;
+        this.board = board;
+        this.currentPlayer = currentPlayer;
+        this.totalTurns = totalTurns;
+        whiteTurns = 0;
+        blackTurns = 0;
+        whitePieces = 0;
+        blackPieces = 0;
+        whiteKingPieces = 0;
+        blackKingPieces = 0;
         calculateBoardConditions();
     }
 
@@ -45,18 +61,19 @@ public class Board {
             int middleRow = (move.fromRow + move.targetRow) / 2;
             int middleColumn = (move.fromColumn + move.targetColumn) / 2;
             board[middleRow][middleColumn] = EMPTY;
+            move.isCapture = true;
             return true;
         }
         return false;
     }
 
     public int makeMove(Move move) {
-
+        moveSequence.add(move);
         board[move.targetRow][move.targetColumn] = board[move.fromRow][move.fromColumn];
         board[move.fromRow][move.fromColumn] = EMPTY;
 
-        if (move.targetRow == 0 && board[move.targetRow][move.targetColumn] == RED)
-            board[move.targetRow][move.targetColumn] = RED_KING;
+        if (move.targetRow == 0 && board[move.targetRow][move.targetColumn] == WHITE)
+            board[move.targetRow][move.targetColumn] = WHITE_KING;
         if (move.targetRow == 7 && board[move.targetRow][move.targetColumn] == BLACK)
             board[move.targetRow][move.targetColumn] = BLACK_KING;
 
@@ -64,12 +81,12 @@ public class Board {
         int state = calculateBoardConditions();
 
         if (!isCapture && state == 0) {
-            if (currentPlayer == RED) {
-                redTurns++;
+            if (currentPlayer == WHITE) {
+                whiteTurns++;
                 currentPlayer = BLACK;
             } else if (currentPlayer == BLACK) {
                 blackTurns++;
-                currentPlayer = RED;
+                currentPlayer = WHITE;
             }
         }
         totalTurns++;
@@ -78,22 +95,22 @@ public class Board {
     }
 
     private int calculateBoardConditions() {
-        this.redPieces = 0;
+        this.whitePieces = 0;
         this.blackPieces = 0;
-        this.redKingPieces = 0;
+        this.whiteKingPieces = 0;
         this.blackKingPieces = 0;
 
         for (int r = 0; r < 8; r++) {
             for (int c = 0; c < 8; c++) {
                 switch(board[r][c]) {
-                    case RED:
-                        redPieces++;
+                    case WHITE:
+                        whitePieces++;
                         break;
                     case BLACK:
                         blackPieces++;
                         break;
-                    case RED_KING:
-                        redKingPieces++;
+                    case WHITE_KING:
+                        whiteKingPieces++;
                         break;
                     case BLACK_KING:
                         blackKingPieces++;
@@ -101,36 +118,36 @@ public class Board {
                 }
             }
         }
-        if (redPieces == 0 && redKingPieces == 0) {
+        if (whitePieces == 0 && whiteKingPieces == 0) {
             return BLACK;
         } else if (blackPieces == 0 && blackKingPieces == 0) {
-            return RED;
+            return WHITE;
         }
         return 0;
     }
 
     public ArrayList<Move> getLegalMoves(int player) {
         ArrayList<Move> legalMoves = new ArrayList<>();
-        int playerKing = player == RED ? RED_KING : BLACK_KING;
+        int playerKing = player == WHITE ? WHITE_KING : BLACK_KING;
         for (int r = 0; r < 8; r++) {
             for (int c = 0; c < 8; c++) {
                 if (board[r][c] == player || board[r][c] == playerKing) {
                     if (isLegalCapture(player, r, c, r+1, c+1, r+2, c+2))
-                        legalMoves.add(new Move(r, c, r+2, c+2));
+                        legalMoves.add(new Move(player, r, c, r+2, c+2, true));
                     if (isLegalCapture(player, r, c, r-1, c+1, r-2, c+2))
-                        legalMoves.add(new Move(r, c, r-2, c+2));
+                        legalMoves.add(new Move(player, r, c, r-2, c+2, true));
                     if (isLegalCapture(player, r, c, r+1, c-1, r+2, c-2))
-                        legalMoves.add(new Move(r, c, r+2, c-2));
+                        legalMoves.add(new Move(player, r, c, r+2, c-2, true));
                     if (isLegalCapture(player, r, c, r-1, c-1, r-2, c-2))
-                        legalMoves.add(new Move(r, c, r-2, c-2));
+                        legalMoves.add(new Move(player, r, c, r-2, c-2, true));
                     if (isLegalMove(player,r,c,r+1,c+1))
-                        legalMoves.add(new Move(r,c,r+1,c+1));
+                        legalMoves.add(new Move(player, r,c,r+1,c+1));
                     if (isLegalMove(player,r,c,r-1,c+1))
-                        legalMoves.add(new Move(r,c,r-1,c+1));
+                        legalMoves.add(new Move(player, r,c,r-1,c+1));
                     if (isLegalMove(player,r,c,r+1,c-1))
-                        legalMoves.add(new Move(r,c,r+1,c-1));
+                        legalMoves.add(new Move(player, r,c,r+1,c-1));
                     if (isLegalMove(player,r,c,r-1,c-1))
-                        legalMoves.add(new Move(r,c,r-1,c-1));
+                        legalMoves.add(new Move(player, r,c,r-1,c-1));
                 }
             }
         }
@@ -145,11 +162,11 @@ public class Board {
         if (board[targetRow][targetColumn] != EMPTY)
             return false;
 
-        if (player == RED) {
-            return board[fromRow][fromColumn] != RED || targetRow <= fromRow && (board[middleRow][middleColumn] == BLACK || board[middleRow][middleColumn] == BLACK_KING);
+        if (player == WHITE) {
+            return board[fromRow][fromColumn] != WHITE || targetRow <= fromRow && (board[middleRow][middleColumn] == BLACK || board[middleRow][middleColumn] == BLACK_KING);
         }
         else {
-            return board[fromRow][fromColumn] != BLACK || targetRow >= fromRow && (board[middleRow][middleColumn] == RED || board[middleRow][middleColumn] == RED_KING);
+            return board[fromRow][fromColumn] != BLACK || targetRow >= fromRow && (board[middleRow][middleColumn] == WHITE || board[middleRow][middleColumn] == WHITE_KING);
         }
     }
 
@@ -161,8 +178,8 @@ public class Board {
         if (board[middleRow][middleColumn] != EMPTY)
             return false;
 
-        if (player == RED) {
-            return board[fromRow][fromColumn] != RED || middleRow <= fromRow;
+        if (player == WHITE) {
+            return board[fromRow][fromColumn] != WHITE || middleRow <= fromRow;
         }
         else {
             return board[fromRow][fromColumn] != BLACK || middleRow >= fromRow;
@@ -176,7 +193,7 @@ public class Board {
                     if (row < 3)
                         board[row][col] = BLACK;
                     else if (row > 4)
-                        board[row][col] = RED;
+                        board[row][col] = WHITE;
                     else
                         board[row][col] = EMPTY;
                 }
@@ -194,6 +211,7 @@ public class Board {
     }
 
     public void printBoard() {
+        System.out.println("Turn: " + totalTurns);
         for (int i = 0; i < 8; i++) {
             for (int j = 0; j < 8; j++) {
                 System.out.print(board[i][j]);
@@ -201,7 +219,22 @@ public class Board {
             }
             System.out.print("\n");
         }
-        System.out.println("Red pieces: " + redPieces);
-        System.out.println("Black pieces: " + blackPieces);
+    }
+
+    public Board cloneBoard() {
+        int[][] copy = new int[8][8];
+        for (int i = 0; i < 8; i++) {
+            System.arraycopy(board[i], 0, copy[i], 0, 8);
+        }
+        return new Board(copy, moveSequence, currentPlayer, totalTurns);
+    }
+
+
+    public void printGameDetails() {
+        int i = 1;
+        for (Move m : moveSequence) {
+            System.out.println("Move " + i + ": " + m.toString() + (m.isCapture ? " Capturing a game piece at [" + (m.targetRow+m.fromRow)/2 + ", " + (m.targetColumn+m.fromColumn)/2 + "]" : ""));
+            i++;
+        }
     }
 }
