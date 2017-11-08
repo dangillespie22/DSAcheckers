@@ -19,14 +19,14 @@
     -fx-font-family: verdana;
     -fx-font-weight: bold;
     -fx-font-size: 40;
-    -fx-fill: saddlebrown;
+    -fx-fill: linear-gradient(#8B4513, #C04513);
 }
 
 .infoText {
     -fx-font-family: verdana;
     -fx-font-weight: bold;
     -fx-font-size: 20;
-    -fx-fill: saddlebrown;
+    -fx-fill: linear-gradient(#8B4513, #C04513);
 }
 
 .textWhite {
@@ -43,13 +43,6 @@
     -fx-fill: black;
 }
 
-.blackPiece, .blackKingPiece {
-     -fx-fill: black;
-     -fx-border-style: solid inside;
-     -fx-border-width: 10;
-     -fx-border-insets: 5;
-     -fx-border-color: black;
-}
 
 .blackPiece:hover, .blackKingPiece:hover {
     -fx-fill: maroon;
@@ -59,13 +52,6 @@
     -fx-border-color: black;
 }
 
-.whitePiece, .whitePiece {
-    -fx-fill: white;
-    -fx-border-style: solid;
-    -fx-border-insets: 5;
-    -fx-border-width: 10;
-    -fx-border-color: black;
-}
 
 .whitePiece:hover, .whiteKingPiece:hover{
     -fx-fill: maroon;

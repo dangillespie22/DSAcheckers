@@ -67,19 +67,12 @@ public class Board {
     }
 
     public int makeMove(Move move) {
+
         moveSequence.add(move);
-        board[move.targetRow][move.targetColumn] = board[move.fromRow][move.fromColumn];
-        board[move.fromRow][move.fromColumn] = EMPTY;
-
-        if (move.targetRow == 0 && board[move.targetRow][move.targetColumn] == WHITE)
-            board[move.targetRow][move.targetColumn] = WHITE_KING;
-        if (move.targetRow == 7 && board[move.targetRow][move.targetColumn] == BLACK)
-            board[move.targetRow][move.targetColumn] = BLACK_KING;
-
-        boolean isCapture = handleCapture(move);
+        doMove(board, move);
         int state = calculateBoardConditions();
 
-        if (!isCapture && state == 0) {
+        if (!move.isCapture() && state == 0) {
             if (currentPlayer == WHITE) {
                 whiteTurns++;
                 currentPlayer = BLACK;
@@ -91,6 +84,25 @@ public class Board {
         totalTurns++;
 
         return state;
+    }
+
+    private void doMove(int[][] board, Move move) {
+        board[move.targetRow][move.targetColumn] = board[move.fromRow][move.fromColumn];
+        board[move.fromRow][move.fromColumn] = EMPTY;
+
+        if (move.targetRow == 0)
+            if (board[move.targetRow][move.targetColumn] == WHITE) {
+                board[move.targetRow][move.targetColumn] = WHITE_KING;
+            }
+        if (move.targetRow == 7)
+            if (board[move.targetRow][move.targetColumn] == BLACK) {
+                board[move.targetRow][move.targetColumn] = BLACK_KING;
+            }
+        if (move.isCapture()) {
+            int middleRow = (move.fromRow + move.targetRow) / 2;
+            int middleColumn = (move.fromColumn + move.targetColumn) / 2;
+            board[middleRow][middleColumn] = EMPTY;
+        }
     }
 
     private int calculateBoardConditions() {
@@ -221,11 +233,61 @@ public class Board {
     }
 
     public Board cloneBoard() {
+        return new Board(getCurrentBoardClone(), moveSequence, currentPlayer, totalTurns);
+    }
+
+    public int[][] getCurrentBoardClone() {
         int[][] copy = new int[8][8];
         for (int i = 0; i < 8; i++) {
             System.arraycopy(board[i], 0, copy[i], 0, 8);
         }
-        return new Board(copy, moveSequence, currentPlayer, totalTurns);
+        return copy;
+    }
+
+    public Move calculateBestMove() {
+
+        ArrayList<Move> legalMoves = getLegalMoves(currentPlayer);
+        Move bestMove = legalMoves.get(0);
+        int bestMoveScore = 0;
+        for (Move m : legalMoves) {
+            int moveScore = getMoveScore(m);
+            if (moveScore > bestMoveScore) {
+                System.out.println(m.toString());
+                bestMoveScore = moveScore;
+                bestMove = m;
+            }
+        }
+        return bestMove;
+    }
+
+    public int getMoveScore(Move move) {
+        int actingPlayer = move.getPlayer();
+        int opponent = actingPlayer == WHITE ? BLACK : WHITE;
+        int moveScore = 0;
+        int[][] copy = getCurrentBoardClone();
+
+        doMove(copy, move);
+
+        int actingPlayerPieces = 0;
+        int opponentPieces = 0;
+        for (int r = 0; r < 8; r++) {
+            for (int c = 0; c < 8; c++) {
+                if (copy[r][c] == actingPlayer) {
+                    actingPlayerPieces++;
+                }
+                if (copy[r][c] == actingPlayer + 2) {
+                    actingPlayerPieces += 2;
+                }
+                if (copy[r][c] == opponent) {
+                    opponentPieces++;
+                }
+                if (copy[r][c] == opponent + 2) {
+                    opponentPieces += 2;
+                }
+            }
+        }
+        System.out.println(move.toString() + " Score: " + (actingPlayerPieces - opponentPieces));
+        return actingPlayerPieces - opponentPieces;
     }
 
 

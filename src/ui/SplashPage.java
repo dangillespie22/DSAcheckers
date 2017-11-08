@@ -96,14 +96,19 @@ public class SplashPage extends Application {
         buildBoard();
         drawSquares();
         drawPieces();
-        System.out.println("Turn: " + currentBoard.getTotalTurns());
-        System.out.println("Current player: " + (currentBoard.getCurrentPlayer() == WHITE ? "WHITE" : "BLACK"));
-        currentBoard.printBoard();
+//        System.out.println("Turn: " + currentBoard.getTotalTurns());
+//        System.out.println("Current player: " + (currentBoard.getCurrentPlayer() == WHITE ? "WHITE" : "BLACK"));
+//        currentBoard.printBoard();
         buildElements();
-        for (Board b : gameStates) {
-            System.out.println((b.getCurrentPlayer() == WHITE ? "White: " : "Black: ") + b.getTotalTurns());
-        }
+//        for (Board b : gameStates) {
+//            System.out.println((b.getCurrentPlayer() == WHITE ? "White: " : "Black: ") + b.getTotalTurns());
+//        }
         System.out.println();
+        ArrayList<Move> legalMoves = currentBoard.getLegalMoves(currentBoard.getCurrentPlayer());
+        for (Move m : legalMoves) {
+            currentBoard.getMoveScore(m);
+        }
+
     }
 
     private void buildBoard() {
@@ -172,10 +177,7 @@ public class SplashPage extends Application {
     }
 
     private void doAiTurn() {
-        ArrayList<Move> moves = currentBoard.getLegalMoves(currentBoard.getCurrentPlayer());
-        Random r = new Random();
-        int index = r.nextInt(moves.size());
-        Move move = moves.get(index);
+        Move move = currentBoard.calculateBestMove();
         currentBoard.makeMove(move);
         paintBoard();
         if (move.isCapture()) {
@@ -193,6 +195,7 @@ public class SplashPage extends Application {
                     final Circle piece = new Circle(SQUARES / 2 - 4, WHITE_COLOUR);
                     whitePieces[whiteCounter] = piece;
                     whitePieces[whiteCounter].setStroke(Color.BLACK);
+                    whitePieces[whiteCounter].getStyleClass().add("whitePiece");
                     gameBoard.add(piece, j, i);
                     piece.setOnMouseClicked(event -> {
                         if (currentBoard.getCurrentPlayer() == WHITE) {
@@ -208,6 +211,7 @@ public class SplashPage extends Application {
                     whitePieces[whiteCounter] = piece;
                     whitePieces[whiteCounter].setStroke(Color.SADDLEBROWN);
                     whitePieces[whiteCounter].setStrokeWidth(5);
+                    whitePieces[whiteCounter].getStyleClass().add("whitePiece");
                     gameBoard.add(piece, j, i);
                     piece.setOnMouseClicked(event -> {
                         if (currentBoard.getCurrentPlayer() == WHITE) {
@@ -222,6 +226,7 @@ public class SplashPage extends Application {
                     final Circle piece = new Circle(SQUARES / 2 - 4, BLACK_COLOUR);
                     blackPieces[blackCounter] = piece;
                     blackPieces[blackCounter].setStroke(Color.BLACK);
+                    blackPieces[blackCounter].getStyleClass().add("blackPiece");
                     gameBoard.add(blackPieces[blackCounter], j, i);
                     blackPieces[blackCounter].setOnMouseClicked(event -> {
                         if (currentBoard.getCurrentPlayer() == BLACK) {
@@ -237,6 +242,7 @@ public class SplashPage extends Application {
                     blackPieces[blackCounter] = piece;
                     blackPieces[blackCounter].setStroke(Color.SADDLEBROWN);
                     blackPieces[blackCounter].setStrokeWidth(5);
+                    blackPieces[blackCounter].getStyleClass().add("blackPiece");
                     gameBoard.add(blackPieces[blackCounter], j, i);
                     blackPieces[blackCounter].setOnMouseClicked(event -> {
                         if (currentBoard.getCurrentPlayer() == BLACK) {
@@ -263,7 +269,6 @@ public class SplashPage extends Application {
         Button undo = new Button();
         Button redo = new Button();
         Button restartGame = new Button();
-
 
         Text playerText = new Text("Current player: ");
         Text currentPlayerText = new Text(currentBoard.getCurrentPlayer() == WHITE ? "White" : "Black");
