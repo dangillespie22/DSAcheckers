@@ -56,16 +56,6 @@ public class Board {
         return board;
     }
 
-    private boolean handleCapture(Move move) {
-        if (move.isCapture()) {
-            int middleRow = (move.fromRow + move.targetRow) / 2;
-            int middleColumn = (move.fromColumn + move.targetColumn) / 2;
-            board[middleRow][middleColumn] = EMPTY;
-            return true;
-        }
-        return false;
-    }
-
     public int makeMove(Move move) {
 
         moveSequence.add(move);
@@ -90,14 +80,16 @@ public class Board {
         board[move.targetRow][move.targetColumn] = board[move.fromRow][move.fromColumn];
         board[move.fromRow][move.fromColumn] = EMPTY;
 
-        if (move.targetRow == 0)
+        if (move.targetRow == 0) {
             if (board[move.targetRow][move.targetColumn] == WHITE) {
                 board[move.targetRow][move.targetColumn] = WHITE_KING;
             }
-        if (move.targetRow == 7)
+        }
+        if (move.targetRow == 7) {
             if (board[move.targetRow][move.targetColumn] == BLACK) {
                 board[move.targetRow][move.targetColumn] = BLACK_KING;
             }
+        }
         if (move.isCapture()) {
             int middleRow = (move.fromRow + move.targetRow) / 2;
             int middleColumn = (move.fromColumn + move.targetColumn) / 2;
@@ -167,17 +159,33 @@ public class Board {
 
     private boolean isLegalCapture(int player, int fromRow, int fromColumn, int middleRow, int middleColumn, int targetRow, int targetColumn) {
 
-        if (targetRow < 0 || targetRow >= 8 || targetColumn < 0 || targetColumn >= 8)
+        if (targetRow < 0 || targetRow >= 8 || targetColumn < 0 || targetColumn >= 8) {
             return false;
-
-        if (board[targetRow][targetColumn] != EMPTY)
+        }
+        if (board[targetRow][targetColumn] != EMPTY) {
             return false;
-
+        }
         if (player == WHITE) {
-            return board[fromRow][fromColumn] != WHITE || targetRow <= fromRow && (board[middleRow][middleColumn] == BLACK || board[middleRow][middleColumn] == BLACK_KING);
+            if (board[fromRow][fromColumn] == WHITE_KING) {
+                return true;
+            }
+            if (targetRow <= fromRow) {
+                if (board[middleRow][middleColumn] == BLACK || board[middleRow][middleColumn] == BLACK_KING) {
+                    return true;
+                }
+            }
+            return false;
         }
         else {
-            return board[fromRow][fromColumn] != BLACK || targetRow >= fromRow && (board[middleRow][middleColumn] == WHITE || board[middleRow][middleColumn] == WHITE_KING);
+            if (board[fromRow][fromColumn] == BLACK_KING) {
+                return true;
+            }
+            if (targetRow >= fromRow) {
+                if (board[middleRow][middleColumn] == WHITE || board[middleRow][middleColumn] == WHITE_KING) {
+                    return true;
+                }
+            }
+            return false;
         }
     }
 
@@ -236,7 +244,7 @@ public class Board {
         return new Board(getCurrentBoardClone(), moveSequence, currentPlayer, totalTurns);
     }
 
-    public int[][] getCurrentBoardClone() {
+    private int[][] getCurrentBoardClone() {
         int[][] copy = new int[8][8];
         for (int i = 0; i < 8; i++) {
             System.arraycopy(board[i], 0, copy[i], 0, 8);
@@ -268,28 +276,44 @@ public class Board {
 
         doMove(copy, move);
 
-        int actingPlayerPieces = 0;
-        int opponentPieces = 0;
         for (int r = 0; r < 8; r++) {
             for (int c = 0; c < 8; c++) {
                 if (copy[r][c] == actingPlayer) {
-                    actingPlayerPieces++;
+                    moveScore++;
                 }
                 if (copy[r][c] == actingPlayer + 2) {
-                    actingPlayerPieces += 2;
+                    moveScore += 2;
                 }
                 if (copy[r][c] == opponent) {
-                    opponentPieces++;
+                    moveScore--;
                 }
                 if (copy[r][c] == opponent + 2) {
-                    opponentPieces += 2;
+                    moveScore -= 2;
                 }
             }
         }
-        System.out.println(move.toString() + " Score: " + (actingPlayerPieces - opponentPieces));
-        return actingPlayerPieces - opponentPieces;
+
+        if (becomesKing(move)) {
+            moveScore += 2;
+        }
+
+        System.out.println(move.toString() + " Score: " + (moveScore));
+        return moveScore;
     }
 
+    private boolean becomesKing(Move move) {
+        if (move.targetRow == 0) {
+            if (board[move.targetRow][move.targetColumn] == WHITE) {
+                return true;
+            }
+        }
+        if (move.targetRow == 7) {
+            if (board[move.targetRow][move.targetColumn] == BLACK) {
+                return true;
+            }
+        }
+        return false;
+    }
 
     public void printGameDetails() {
         int i = 1;
