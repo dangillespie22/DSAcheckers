@@ -15,16 +15,7 @@ public class Move {
         this.fromColumn = fromColumn;
         this.targetRow = targetRow;
         this.targetColumn = targetColumn;
-        this.isCapture = false;
-    }
-
-    public Move (int player, int fromRow, int fromColumn, int targetRow, int targetColumn, boolean isCapture) {
-        this.player = player;
-        this.fromRow = fromRow;
-        this.fromColumn = fromColumn;
-        this.targetRow = targetRow;
-        this.targetColumn = targetColumn;
-        this.isCapture = isCapture;
+        this.isCapture = (fromRow - targetRow == 2 || fromRow - targetRow == -2);
     }
 
     @Override
@@ -37,8 +28,17 @@ public class Move {
         return false;
     }
 
+    public boolean isCapture() {
+        return isCapture;
+    }
+
+    public int getPlayer() {
+        return player;
+    }
+
     @Override
     public String toString () {
-       return "Player " + (player == 1 ? "White" : "Black") + " - [" + fromRow + ", " + fromColumn + "] -> [" + targetRow + ", " + targetColumn + "]";
+       return "Player " + (player == 1 ? "White" : "Black") + " - [" + fromRow + ", " + fromColumn + "] -> [" + targetRow + ", " + targetColumn + "]" +
+               (isCapture ? " Capturing a game piece at [" + (targetRow+fromRow)/2 + ", " + (targetColumn+fromColumn)/2 + "]" : "");
     }
 }

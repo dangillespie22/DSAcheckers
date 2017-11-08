@@ -57,11 +57,10 @@ public class Board {
     }
 
     private boolean handleCapture(Move move) {
-        if (move.fromRow - move.targetRow == 2 || move.fromRow - move.targetRow == -2) {
+        if (move.isCapture()) {
             int middleRow = (move.fromRow + move.targetRow) / 2;
             int middleColumn = (move.fromColumn + move.targetColumn) / 2;
             board[middleRow][middleColumn] = EMPTY;
-            move.isCapture = true;
             return true;
         }
         return false;
@@ -133,13 +132,13 @@ public class Board {
             for (int c = 0; c < 8; c++) {
                 if (board[r][c] == player || board[r][c] == playerKing) {
                     if (isLegalCapture(player, r, c, r+1, c+1, r+2, c+2))
-                        legalMoves.add(new Move(player, r, c, r+2, c+2, true));
+                        legalMoves.add(new Move(player, r, c, r+2, c+2));
                     if (isLegalCapture(player, r, c, r-1, c+1, r-2, c+2))
-                        legalMoves.add(new Move(player, r, c, r-2, c+2, true));
+                        legalMoves.add(new Move(player, r, c, r-2, c+2));
                     if (isLegalCapture(player, r, c, r+1, c-1, r+2, c-2))
-                        legalMoves.add(new Move(player, r, c, r+2, c-2, true));
+                        legalMoves.add(new Move(player, r, c, r+2, c-2));
                     if (isLegalCapture(player, r, c, r-1, c-1, r-2, c-2))
-                        legalMoves.add(new Move(player, r, c, r-2, c-2, true));
+                        legalMoves.add(new Move(player, r, c, r-2, c-2));
                     if (isLegalMove(player,r,c,r+1,c+1))
                         legalMoves.add(new Move(player, r,c,r+1,c+1));
                     if (isLegalMove(player,r,c,r-1,c+1))
@@ -147,7 +146,7 @@ public class Board {
                     if (isLegalMove(player,r,c,r+1,c-1))
                         legalMoves.add(new Move(player, r,c,r+1,c-1));
                     if (isLegalMove(player,r,c,r-1,c-1))
-                        legalMoves.add(new Move(player, r,c,r-1,c-1));
+                        legalMoves.add(new Move(player, r ,c,r-1,c-1));
                 }
             }
         }
@@ -233,7 +232,7 @@ public class Board {
     public void printGameDetails() {
         int i = 1;
         for (Move m : moveSequence) {
-            System.out.println("Move " + i + ": " + m.toString() + (m.isCapture ? " Capturing a game piece at [" + (m.targetRow+m.fromRow)/2 + ", " + (m.targetColumn+m.fromColumn)/2 + "]" : ""));
+            System.out.println("Move " + i + ": " + m.toString());
             i++;
         }
     }

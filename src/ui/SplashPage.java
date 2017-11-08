@@ -13,6 +13,7 @@ import javafx.scene.text.Text;
 import javafx.stage.Stage;
 
 import java.util.ArrayList;
+import java.util.Random;
 
 public class SplashPage extends Application {
     private static final int BOARD_DIM = 8;
@@ -23,6 +24,9 @@ public class SplashPage extends Application {
     private static final int BLACK = 2;
     private static final int WHITE_KING = 3;
     private static final int BLACK_KING = 4;
+    private static final int PvP = 1;
+    private static final int PvAI = 2;
+    private static final int AIvAI = 3;
     private Circle selectedPiece = null;
     private Circle[] whitePieces = new Circle[12];
     private Circle[] blackPieces = new Circle[12];
@@ -31,15 +35,19 @@ public class SplashPage extends Application {
     private ArrayList<Board> gameStates;
     private ArrayList<Board> gameStatesRedo;
     private Board currentBoard;
+    private int gameType;
 
     public static void main(String[] args) {
         launch(args);
     }
 
     public void start(Stage primaryStage) {
+        gameType = PvAI;
         gameStates = new ArrayList<>();
         gameStatesRedo = new ArrayList<>();
         this.currentBoard = new Board();
+        System.out.println("Adding: " + currentBoard.getTotalTurns());
+        gameStates.add(currentBoard.cloneBoard());
         paintBoard();
         Scene scene = new Scene(layout);
         scene.getStylesheets().add("game/style.css");
@@ -50,24 +58,47 @@ public class SplashPage extends Application {
 
     private void restartGame() {
         this.currentBoard = new Board();
-        gameStates.add(currentBoard.cloneBoard());
         gameStates = new ArrayList<>();
         gameStatesRedo = new ArrayList<>();
+        System.out.println("Adding: " + currentBoard.getTotalTurns());
+        gameStates.add(currentBoard.cloneBoard());
         paintBoard();
+    }
+
+    private void startPvP() {
+        this.gameType = PvP;
+        restartGame();
+    }
+
+    private void startPvAI() {
+        this.gameType = PvAI;
+        restartGame();
     }
 
     private void backOneTurn() {
 
+        this.currentBoard = gameStates.get(gameStates.size()-1).cloneBoard();
+        for (Board b : gameStates) {
+            System.out.println((b.getCurrentPlayer() == WHITE ? "White: " : "Black: ") + b.getTotalTurns());
+        }
         gameStatesRedo.add(0, gameStates.get(gameStates.size()-1).cloneBoard());
-        this.currentBoard = gameStates.get(gameStates.size()-1);
-        gameStates.remove(gameStates.size()-1);
+        if (gameStates.size() != 1) {
+            System.out.println("Removing turn: " + (gameStates.get(gameStates.size()-1).getTotalTurns()));
+            gameStates.remove(gameStates.size()-1);
+        }
+
         paintBoard();
     }
 
     private void forwardOneTurn() {
 
+        System.out.println("Adding: " + currentBoard.getTotalTurns());
         gameStates.add(gameStatesRedo.get(0).cloneBoard());
         this.currentBoard = gameStatesRedo.get(0);
+        for (Board b : gameStates) {
+            System.out.println((b.getCurrentPlayer() == WHITE ? "White: " : "Black: ") + b.getTotalTurns());
+        }
+        System.out.println("Removing turn:" + gameStatesRedo.get(0));
         gameStatesRedo.remove(0);
         paintBoard();
     }
@@ -80,6 +111,10 @@ public class SplashPage extends Application {
 //        System.out.println("Current player: " + (currentBoard.getCurrentPlayer() == WHITE ? "WHITE" : "BLACK"));
 //        currentBoard.printBoard();
         buildElements();
+        for (Board b : gameStates) {
+            System.out.println((b.getCurrentPlayer() == WHITE ? "White: " : "Black: ") + b.getTotalTurns());
+        }
+        System.out.println();
     }
 
     private void buildBoard() {
@@ -113,11 +148,18 @@ public class SplashPage extends Application {
                         ArrayList<Move> legalMoves = currentBoard.getLegalMoves(currentBoard.getCurrentPlayer());
                         if (legalMoves.contains(move)) {
                             int state = currentBoard.makeMove(move);
+                            System.out.println("Adding: " + currentBoard.getTotalTurns());
                             gameStates.add(currentBoard.cloneBoard());
                             gameStatesRedo.clear();
                             paintBoard();
+                            if (move.isCapture()) {
+                                System.out.println("Player captured " + (move.getPlayer() == WHITE ? "black piece" : "white piece "));
+                            }
                             if (state != 0) {
                                 calculateWinner(state);
+                            }
+                            if (gameType == PvAI && !move.isCapture()) {
+                                doAiTurn();
                             }
                         }
                     }
@@ -138,6 +180,19 @@ public class SplashPage extends Application {
         }
         for (Circle c : blackPieces) {
             c.setFill(BLACK_COLOUR);
+        }
+    }
+
+    private void doAiTurn() {
+        ArrayList<Move> moves = currentBoard.getLegalMoves(currentBoard.getCurrentPlayer());
+        Random r = new Random();
+        int index = r.nextInt(moves.size());
+        Move move = moves.get(index);
+        currentBoard.makeMove(move);
+        paintBoard();
+        if (move.isCapture()) {
+            System.out.println("AI Captured " + (move.getPlayer() == WHITE ? "Black piece" : "White piece "));
+            doAiTurn();
         }
     }
 
@@ -245,6 +300,16 @@ public class SplashPage extends Application {
                 System.out.println("No forward moves!");
             }
         });
+
+        startPlayerVsPlayer.setOnMouseClicked(event -> {
+            startPvP();
+        });
+
+        startPlayerVsAI.setOnMouseClicked(event -> {
+            System.out.println("Starting AI game");
+            startPvAI();
+        });
+
 
         buttons.setPadding(new Insets(30, 0, 0, 0));
         buttons.setPrefWidth(130);
