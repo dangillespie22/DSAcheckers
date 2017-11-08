@@ -1,12 +1,18 @@
 .button {
-    -fx-background-color: saddlebrown;
+    -fx-background-color: linear-gradient(#C04513, #8B4513);
+    -fx-text-fill: lightsalmon;
+    -fx-font-weight: bold;
+}
+
+.button:hover {
+    -fx-background-color: linear-gradient(#8B4513, #C04513);
     -fx-text-fill: lightsalmon;
     -fx-font-weight: bold;
 }
 
 .layout {
-    -fx-padding: 15 30 30 30;
-    -fx-background-color: lightsalmon;
+    -fx-padding: 15 15 15 15;
+    -fx-background-color: linear-gradient(#FFA07A, #9E6341);
 }
 
 .turnText {
@@ -37,8 +43,40 @@
     -fx-fill: black;
 }
 
-.gameBoard {
+.blackPiece, .blackKingPiece {
+     -fx-fill: black;
+     -fx-border-style: solid inside;
+     -fx-border-width: 10;
+     -fx-border-insets: 5;
+     -fx-border-color: black;
+}
+
+.blackPiece:hover, .blackKingPiece:hover {
+    -fx-fill: maroon;
     -fx-border-style: solid inside;
+    -fx-border-width: 10;
+    -fx-border-insets: 5;
+    -fx-border-color: black;
+}
+
+.whitePiece, .whitePiece {
+    -fx-fill: white;
+    -fx-border-style: solid;
+    -fx-border-insets: 5;
+    -fx-border-width: 10;
+    -fx-border-color: black;
+}
+
+.whitePiece:hover, .whiteKingPiece:hover{
+    -fx-fill: maroon;
+    -fx-border-style: solid;
+    -fx-border-insets: 5;
+    -fx-border-width: 10;
+    -fx-border-color: black;
+}
+
+.gameBoard {
+    -fx-border-style: solid;
     -fx-border-width: 5;
     -fx-border-insets: 5;
     -fx-border-radius: 2;

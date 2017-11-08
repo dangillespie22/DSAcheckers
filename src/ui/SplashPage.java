@@ -46,7 +46,6 @@ public class SplashPage extends Application {
         gameStates = new ArrayList<>();
         gameStatesRedo = new ArrayList<>();
         this.currentBoard = new Board();
-        System.out.println("Adding: " + currentBoard.getTotalTurns());
         paintBoard();
         Scene scene = new Scene(layout);
         scene.getStylesheets().add("game/style.css");
@@ -59,7 +58,6 @@ public class SplashPage extends Application {
         this.currentBoard = new Board();
         gameStates = new ArrayList<>();
         gameStatesRedo = new ArrayList<>();
-        System.out.println("Adding: " + currentBoard.getTotalTurns());
         paintBoard();
     }
 
@@ -98,9 +96,9 @@ public class SplashPage extends Application {
         buildBoard();
         drawSquares();
         drawPieces();
-//        System.out.println("Turn: " + currentBoard.getTotalTurns());
-//        System.out.println("Current player: " + (currentBoard.getCurrentPlayer() == WHITE ? "WHITE" : "BLACK"));
-//        currentBoard.printBoard();
+        System.out.println("Turn: " + currentBoard.getTotalTurns());
+        System.out.println("Current player: " + (currentBoard.getCurrentPlayer() == WHITE ? "WHITE" : "BLACK"));
+        currentBoard.printBoard();
         buildElements();
         for (Board b : gameStates) {
             System.out.println((b.getCurrentPlayer() == WHITE ? "White: " : "Black: ") + b.getTotalTurns());
@@ -271,9 +269,7 @@ public class SplashPage extends Application {
         Text currentPlayerText = new Text(currentBoard.getCurrentPlayer() == WHITE ? "White" : "Black");
         Text currentTurn = new Text("Current turn: " + currentBoard.getTotalTurns());
 
-        restartGame.setOnMouseClicked(event -> {
-            restartGame();
-        });
+        restartGame.setOnMouseClicked(event -> restartGame());
 
         undo.setOnMouseClicked(event -> {
             if (!gameStates.isEmpty()) {
@@ -291,17 +287,12 @@ public class SplashPage extends Application {
             }
         });
 
-        startPlayerVsPlayer.setOnMouseClicked(event -> {
-            startPvP();
-        });
+        startPlayerVsPlayer.setOnMouseClicked(event -> startPvP());
 
         startPlayerVsAI.setOnMouseClicked(event -> {
             System.out.println("Starting AI game");
             startPvAI();
         });
-
-
-        buttons.setPadding(new Insets(30, 0, 0, 0));
         buttons.setPrefWidth(130);
         buttons.setStyle("-fx-spacing: 5;");
 
