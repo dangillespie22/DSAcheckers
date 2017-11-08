@@ -47,7 +47,6 @@ public class SplashPage extends Application {
         gameStatesRedo = new ArrayList<>();
         this.currentBoard = new Board();
         System.out.println("Adding: " + currentBoard.getTotalTurns());
-        gameStates.add(currentBoard.cloneBoard());
         paintBoard();
         Scene scene = new Scene(layout);
         scene.getStylesheets().add("game/style.css");
@@ -61,7 +60,6 @@ public class SplashPage extends Application {
         gameStates = new ArrayList<>();
         gameStatesRedo = new ArrayList<>();
         System.out.println("Adding: " + currentBoard.getTotalTurns());
-        gameStates.add(currentBoard.cloneBoard());
         paintBoard();
     }
 
@@ -77,13 +75,12 @@ public class SplashPage extends Application {
 
     private void backOneTurn() {
 
-        this.currentBoard = gameStates.get(gameStates.size()-1).cloneBoard();
-        for (Board b : gameStates) {
-            System.out.println((b.getCurrentPlayer() == WHITE ? "White: " : "Black: ") + b.getTotalTurns());
+        if (gameStatesRedo.isEmpty()) {
+            gameStatesRedo.add(currentBoard.cloneBoard());
         }
+        this.currentBoard = gameStates.get(gameStates.size()-1).cloneBoard();
         gameStatesRedo.add(0, gameStates.get(gameStates.size()-1).cloneBoard());
         if (gameStates.size() != 1) {
-            System.out.println("Removing turn: " + (gameStates.get(gameStates.size()-1).getTotalTurns()));
             gameStates.remove(gameStates.size()-1);
         }
 
@@ -91,14 +88,8 @@ public class SplashPage extends Application {
     }
 
     private void forwardOneTurn() {
-
-        System.out.println("Adding: " + currentBoard.getTotalTurns());
         gameStates.add(gameStatesRedo.get(0).cloneBoard());
         this.currentBoard = gameStatesRedo.get(0);
-        for (Board b : gameStates) {
-            System.out.println((b.getCurrentPlayer() == WHITE ? "White: " : "Black: ") + b.getTotalTurns());
-        }
-        System.out.println("Removing turn:" + gameStatesRedo.get(0));
         gameStatesRedo.remove(0);
         paintBoard();
     }
@@ -147,9 +138,8 @@ public class SplashPage extends Application {
                         Move move = new Move(currentBoard.getCurrentPlayer(), GridPane.getRowIndex(selectedPiece), GridPane.getColumnIndex(selectedPiece), row, column);
                         ArrayList<Move> legalMoves = currentBoard.getLegalMoves(currentBoard.getCurrentPlayer());
                         if (legalMoves.contains(move)) {
-                            int state = currentBoard.makeMove(move);
-                            System.out.println("Adding: " + currentBoard.getTotalTurns());
                             gameStates.add(currentBoard.cloneBoard());
+                            int state = currentBoard.makeMove(move);
                             gameStatesRedo.clear();
                             paintBoard();
                             if (move.isCapture()) {
