@@ -72,6 +72,7 @@ public class Board {
             }
         }
         totalTurns++;
+        printBoard();
 
         return state;
     }
@@ -130,26 +131,31 @@ public class Board {
     }
 
     public ArrayList<Move> getLegalMoves(int player) {
+        return getLegalMoves(this.board, player);
+    }
+
+    private ArrayList<Move> getLegalMoves(int[][] boardState, int player) {
+
         ArrayList<Move> legalMoves = new ArrayList<>();
         int playerKing = player == WHITE ? WHITE_KING : BLACK_KING;
         for (int r = 0; r < 8; r++) {
             for (int c = 0; c < 8; c++) {
-                if (board[r][c] == player || board[r][c] == playerKing) {
-                    if (isLegalCapture(player, r, c, r+1, c+1, r+2, c+2))
+                if (boardState[r][c] == player || boardState[r][c] == playerKing) {
+                    if (isLegalCapture(boardState, player, r, c, r+1, c+1, r+2, c+2))
                         legalMoves.add(new Move(player, r, c, r+2, c+2));
-                    if (isLegalCapture(player, r, c, r-1, c+1, r-2, c+2))
+                    if (isLegalCapture(boardState, player, r, c, r-1, c+1, r-2, c+2))
                         legalMoves.add(new Move(player, r, c, r-2, c+2));
-                    if (isLegalCapture(player, r, c, r+1, c-1, r+2, c-2))
+                    if (isLegalCapture(boardState, player, r, c, r+1, c-1, r+2, c-2))
                         legalMoves.add(new Move(player, r, c, r+2, c-2));
-                    if (isLegalCapture(player, r, c, r-1, c-1, r-2, c-2))
+                    if (isLegalCapture(boardState, player, r, c, r-1, c-1, r-2, c-2))
                         legalMoves.add(new Move(player, r, c, r-2, c-2));
-                    if (isLegalMove(player,r,c,r+1,c+1))
+                    if (isLegalMove(boardState, player,r,c,r+1,c+1))
                         legalMoves.add(new Move(player, r,c,r+1,c+1));
-                    if (isLegalMove(player,r,c,r-1,c+1))
+                    if (isLegalMove(boardState, player,r,c,r-1,c+1))
                         legalMoves.add(new Move(player, r,c,r-1,c+1));
-                    if (isLegalMove(player,r,c,r+1,c-1))
+                    if (isLegalMove(boardState, player,r,c,r+1,c-1))
                         legalMoves.add(new Move(player, r,c,r+1,c-1));
-                    if (isLegalMove(player,r,c,r-1,c-1))
+                    if (isLegalMove(boardState, player,r,c,r-1,c-1))
                         legalMoves.add(new Move(player, r ,c,r-1,c-1));
                 }
             }
@@ -157,31 +163,34 @@ public class Board {
         return legalMoves;
     }
 
-    private boolean isLegalCapture(int player, int fromRow, int fromColumn, int middleRow, int middleColumn, int targetRow, int targetColumn) {
+    public boolean isLegalCapture(int[][] boardState, int player, int fromRow, int fromColumn, int middleRow, int middleColumn, int targetRow, int targetColumn) {
 
         if (targetRow < 0 || targetRow >= 8 || targetColumn < 0 || targetColumn >= 8) {
             return false;
         }
-        if (board[targetRow][targetColumn] != EMPTY) {
+        if (boardState[middleRow][middleColumn] == EMPTY) {
+            return false;
+        }
+        if (boardState[targetRow][targetColumn] != EMPTY) {
             return false;
         }
         if (player == WHITE) {
-            if (board[fromRow][fromColumn] == WHITE_KING) {
+            if (boardState[fromRow][fromColumn] == WHITE_KING) {
                 return true;
             }
             if (targetRow <= fromRow) {
-                if (board[middleRow][middleColumn] == BLACK || board[middleRow][middleColumn] == BLACK_KING) {
+                if (boardState[middleRow][middleColumn] == BLACK || boardState[middleRow][middleColumn] == BLACK_KING) {
                     return true;
                 }
             }
             return false;
         }
         else {
-            if (board[fromRow][fromColumn] == BLACK_KING) {
+            if (boardState[fromRow][fromColumn] == BLACK_KING) {
                 return true;
             }
             if (targetRow >= fromRow) {
-                if (board[middleRow][middleColumn] == WHITE || board[middleRow][middleColumn] == WHITE_KING) {
+                if (boardState[middleRow][middleColumn] == WHITE || boardState[middleRow][middleColumn] == WHITE_KING) {
                     return true;
                 }
             }
@@ -189,19 +198,19 @@ public class Board {
         }
     }
 
-    private boolean isLegalMove(int player, int fromRow, int fromColumn, int middleRow, int middleColumn) {
+    private boolean isLegalMove(int[][] boardState, int player, int fromRow, int fromColumn, int middleRow, int middleColumn) {
 
         if (middleRow < 0 || middleRow >= 8 || middleColumn < 0 || middleColumn >= 8)
             return false;
 
-        if (board[middleRow][middleColumn] != EMPTY)
+        if (boardState[middleRow][middleColumn] != EMPTY)
             return false;
 
         if (player == WHITE) {
-            return board[fromRow][fromColumn] != WHITE || middleRow <= fromRow;
+            return boardState[fromRow][fromColumn] != WHITE || middleRow <= fromRow;
         }
         else {
-            return board[fromRow][fromColumn] != BLACK || middleRow >= fromRow;
+            return boardState[fromRow][fromColumn] != BLACK || middleRow >= fromRow;
         }
     }
 
@@ -256,7 +265,7 @@ public class Board {
 
         ArrayList<Move> legalMoves = getLegalMoves(currentPlayer);
         Move bestMove = legalMoves.get(0);
-        int bestMoveScore = 0;
+        int bestMoveScore = getMoveScore(legalMoves.get(0));
         for (Move m : legalMoves) {
             int moveScore = getMoveScore(m);
             if (moveScore > bestMoveScore) {
@@ -279,25 +288,52 @@ public class Board {
         for (int r = 0; r < 8; r++) {
             for (int c = 0; c < 8; c++) {
                 if (copy[r][c] == actingPlayer) {
-                    moveScore++;
+                    moveScore = moveScore + 10;
+                    if (actingPlayer == WHITE && r < 4) {
+                        moveScore = moveScore + 5;
+                    }
+                    else if (actingPlayer == BLACK && r > 3) {
+                        moveScore = moveScore + 5;
+                    }
                 }
                 if (copy[r][c] == actingPlayer + 2) {
-                    moveScore += 2;
+                    moveScore = moveScore + 20;
                 }
                 if (copy[r][c] == opponent) {
-                    moveScore--;
+                    moveScore = moveScore - 10;
+                    if (opponent == WHITE && r < 4) {
+                        moveScore = moveScore - 5;
+                    }
+                    else if (opponent == BLACK && r > 3) {
+                        moveScore = moveScore - 5;
+                    }
                 }
                 if (copy[r][c] == opponent + 2) {
-                    moveScore -= 2;
+                    moveScore  = moveScore - 20;
                 }
             }
         }
 
+        if (move.isCapture()) {
+            ArrayList<Move> legalMoves = getLegalMoves(copy, currentPlayer);
+            for (Move m : legalMoves) {
+                if (m.isCapture()) {
+                    moveScore = moveScore + 20;
+                }
+            }
+        } else {
+            ArrayList<Move> legalMoves = getLegalMoves(copy, opponent);
+            for (Move m : legalMoves) {
+                if (m.isCapture()) {
+                    moveScore = moveScore - 30;
+                }
+            }
+        }
         if (becomesKing(move)) {
-            moveScore += 2;
+            moveScore = moveScore + 20;
         }
 
-        System.out.println(move.toString() + " Score: " + (moveScore));
+        //System.out.println(move.toString() + " Score: " + (moveScore));
         return moveScore;
     }
 

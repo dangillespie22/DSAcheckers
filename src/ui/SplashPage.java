@@ -108,7 +108,6 @@ public class SplashPage extends Application {
         for (Move m : legalMoves) {
             currentBoard.getMoveScore(m);
         }
-
     }
 
     private void buildBoard() {
@@ -178,6 +177,8 @@ public class SplashPage extends Application {
 
     private void doAiTurn() {
         Move move = currentBoard.calculateBestMove();
+        System.out.println("AI has selected: " + move.toString());
+
         currentBoard.makeMove(move);
         paintBoard();
         if (move.isCapture()) {
