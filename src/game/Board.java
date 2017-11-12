@@ -72,9 +72,12 @@ public class Board {
             }
         }
         totalTurns++;
-        printBoard();
 
         return state;
+    }
+
+    public ArrayList<Move> getMoveSequence() {
+        return moveSequence;
     }
 
     private void doMove(int[][] board, Move move) {
@@ -126,6 +129,9 @@ public class Board {
             return BLACK;
         } else if (blackPieces == 0 && blackKingPieces == 0) {
             return WHITE;
+        }
+        if (getLegalMoves(getCurrentPlayer()).size() == 0) {
+            return getCurrentPlayer() == WHITE ? BLACK : WHITE;
         }
         return 0;
     }
@@ -250,7 +256,11 @@ public class Board {
     }
 
     public Board cloneBoard() {
-        return new Board(getCurrentBoardClone(), moveSequence, currentPlayer, totalTurns);
+        return new Board(getCurrentBoardClone(), getMoveSequenceClone(), currentPlayer, totalTurns);
+    }
+
+    private ArrayList<Move> getMoveSequenceClone() {
+        return new ArrayList<>(this.moveSequence);
     }
 
     private int[][] getCurrentBoardClone() {
@@ -260,7 +270,6 @@ public class Board {
         }
         return copy;
     }
-
     public Move calculateBestMove() {
 
         ArrayList<Move> legalMoves = getLegalMoves(currentPlayer);
@@ -269,7 +278,6 @@ public class Board {
         for (Move m : legalMoves) {
             int moveScore = getMoveScore(m);
             if (moveScore > bestMoveScore) {
-                System.out.println(m.toString());
                 bestMoveScore = moveScore;
                 bestMove = m;
             }

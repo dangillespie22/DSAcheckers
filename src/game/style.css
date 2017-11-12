@@ -2,11 +2,12 @@
     -fx-background-color: linear-gradient(#C04513, #8B4513);
     -fx-text-fill: lightsalmon;
     -fx-font-weight: bold;
+    -fx-border-insets: 5px;
 }
 
 .button:hover {
     -fx-background-color: linear-gradient(#8B4513, #C04513);
-    -fx-text-fill: lightsalmon;
+    -fx-text-fill: linear-gradient(#E6E9F0, #EEF1F5);
     -fx-font-weight: bold;
 }
 
@@ -19,7 +20,8 @@
     -fx-font-family: verdana;
     -fx-font-weight: bold;
     -fx-font-size: 40;
-    -fx-fill: linear-gradient(#8B4513, #C04513);
+
+    -fx-background-color: linear-gradient(#8B4513, #E6E9F0);
 }
 
 .infoText {
@@ -27,6 +29,35 @@
     -fx-font-weight: bold;
     -fx-font-size: 20;
     -fx-fill: linear-gradient(#8B4513, #C04513);
+}
+
+.stateList {
+    -fx-padding: 15;
+}
+.stateListWhite {
+     -fx-font-family: verdana;
+     -fx-font-weight: bold;
+     -fx-font-size: 12;
+     -fx-alignment: top-left;
+     -fx-fill: white;
+ }
+
+.stateListBlack {
+    -fx-font-family: verdana;
+    -fx-font-weight: bold;
+    -fx-font-size: 12;
+    -fx-alignment: top-left;
+    -fx-fill: black;
+    -fx-padding: 30;
+}
+
+.stateTitle {
+    -fx-font-family: verdana;
+    -fx-font-weight: bold;
+    -fx-font-size: 18;
+    -fx-alignment: top-left;
+    -fx-fill: linear-gradient(#8B4513, #C04513);
+    -fx-padding: 15;
 }
 
 .textWhite {

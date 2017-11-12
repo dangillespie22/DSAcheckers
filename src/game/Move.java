@@ -38,7 +38,7 @@ public class Move {
 
     @Override
     public String toString () {
-       return "Player " + (player == 1 ? "White" : "Black") + " - [" + fromRow + ", " + fromColumn + "] -> [" + targetRow + ", " + targetColumn + "]" +
-               (isCapture ? " Capturing a game piece at [" + (targetRow+fromRow)/2 + ", " + (targetColumn+fromColumn)/2 + "]" : "");
+       return (player == 1 ? "White - [" : "Black  - [") + fromRow + ", " + fromColumn + "] -> [" + targetRow + ", " + targetColumn + "]" +
+               (isCapture ? " capture at [" + (targetRow+fromRow)/2 + ", " + (targetColumn+fromColumn)/2 + "]" : "");
     }
 }

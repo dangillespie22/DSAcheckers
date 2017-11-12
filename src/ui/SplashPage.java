@@ -96,18 +96,7 @@ public class SplashPage extends Application {
         buildBoard();
         drawSquares();
         drawPieces();
-//        System.out.println("Turn: " + currentBoard.getTotalTurns());
-//        System.out.println("Current player: " + (currentBoard.getCurrentPlayer() == WHITE ? "WHITE" : "BLACK"));
-//        currentBoard.printBoard();
         buildElements();
-//        for (Board b : gameStates) {
-//            System.out.println((b.getCurrentPlayer() == WHITE ? "White: " : "Black: ") + b.getTotalTurns());
-//        }
-        System.out.println();
-        ArrayList<Move> legalMoves = currentBoard.getLegalMoves(currentBoard.getCurrentPlayer());
-        for (Move m : legalMoves) {
-            currentBoard.getMoveScore(m);
-        }
     }
 
     private void buildBoard() {
@@ -164,6 +153,7 @@ public class SplashPage extends Application {
     private void calculateWinner(int winner) {
         System.out.println("The winner is " + (winner == WHITE ? "WHITE" : "BLACK"));
         currentBoard.printGameDetails();
+        restartGame();
     }
 
     private void resetPieceColours() {
@@ -179,11 +169,14 @@ public class SplashPage extends Application {
         Move move = currentBoard.calculateBestMove();
         System.out.println("AI has selected: " + move.toString());
 
-        currentBoard.makeMove(move);
+        int state = currentBoard.makeMove(move);
         paintBoard();
         if (move.isCapture()) {
             System.out.println("AI Captured " + (move.getPlayer() == WHITE ? "Black piece" : "White piece "));
             doAiTurn();
+        }
+        if (state != 0) {
+            calculateWinner(state);
         }
     }
 
@@ -265,6 +258,7 @@ public class SplashPage extends Application {
         HBox playerInfo = new HBox();
         HBox turnInfo = new HBox();
         VBox buttons = new VBox();
+        VBox stateList = new VBox();
         Button startPlayerVsPlayer = new Button();
         Button startPlayerVsAI = new Button();
         Button undo = new Button();
@@ -274,6 +268,23 @@ public class SplashPage extends Application {
         Text playerText = new Text("Current player: ");
         Text currentPlayerText = new Text(currentBoard.getCurrentPlayer() == WHITE ? "White" : "Black");
         Text currentTurn = new Text("Current turn: " + currentBoard.getTotalTurns());
+        Text stateTitle = new Text("Last 25 Turns");
+        stateTitle.getStyleClass().add("stateTitle");
+        stateList.getChildren().add(stateTitle);
+        stateList.getChildren().add(new Text(""));
+        ArrayList<Move> moveSequence = currentBoard.getMoveSequence();
+
+        int x = 0;
+        for (int i = moveSequence.size()-1; i >= 0; i--) {
+            Move m = moveSequence.get(i);
+            Text turn = new Text(m.toString());
+            turn.getStyleClass().add(m.getPlayer() == WHITE ? "stateListWhite" : "stateListBlack");
+            stateList.getChildren().add(turn);
+            x++;
+            if (x==25) {
+                break;
+            }
+        }
 
         restartGame.setOnMouseClicked(event -> restartGame());
 
@@ -314,6 +325,7 @@ public class SplashPage extends Application {
         restartGame.setMinWidth(buttons.getPrefWidth()-15);
         gameBoard.setMinWidth(450);
         gameBoard.setMinHeight(450);
+        stateList.setMinWidth(300);
 
         undo.getStyleClass().add("button");
         gameInfo.getStyleClass().add("top");
@@ -321,9 +333,9 @@ public class SplashPage extends Application {
         gameBoard.getStyleClass().add("gameBoard");
         playerText.getStyleClass().add("turnText");
         currentTurn.getStyleClass().add("infoText");
+        stateList.getStyleClass().add("stateList");
         currentPlayerText.getStyleClass().add(currentBoard.getCurrentPlayer() == WHITE ? "textWhite" : "textBlack");
         gameBoard.setStyle("-fx-border-color: " + (currentBoard.getCurrentPlayer() == WHITE ? "white" : "black"));
-
 
         playerInfo.getChildren().addAll(playerText, currentPlayerText);
         buttons.getChildren().addAll(startPlayerVsPlayer, startPlayerVsAI, restartGame, undo, redo);
@@ -333,5 +345,6 @@ public class SplashPage extends Application {
         layout.setLeft(buttons);
         layout.setCenter(gameBoard);
         layout.setTop(gameInfo);
+        layout.setRight(stateList);
     }
 }
