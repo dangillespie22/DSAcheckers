@@ -214,15 +214,15 @@ public class SplashPage extends Application {
      */
     private void doAiTurn() {
         Move move = currentBoard.calculateBestMove(); //Evaluation function to calculate best move
-        System.out.println("AI has selected: " + move.toString());
 
         int state = currentBoard.makeMove(move);
         paintBoard();
-        if (move.isCapture()) { //If move is a capture the player gets another turn
-            doAiTurn();
-        }
         if (state != 0) {
             calculateWinner(state);
+            return;
+        }
+        if (move.isCapture()) { //If move is a capture the player gets another turn
+            doAiTurn();
         }
     }
 

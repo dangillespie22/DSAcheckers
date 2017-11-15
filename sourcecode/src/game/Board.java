@@ -60,7 +60,7 @@ public class Board {
         moveSequence.add(move);
         doMove(board, move);
         int state = calculateBoardConditions();
-
+        System.out.println((move.getPlayer() == 1 ? "White" : "Black") + " has played: " + move.toString());
         if (!move.isCapture() && state == 0) {
             if (currentPlayer == WHITE) {
                 currentPlayer = BLACK;
@@ -271,7 +271,8 @@ public class Board {
     Prints to the console the current game board array formatted to appear like a game board
      */
     public void printBoard() {
-        System.out.println("Turn: " + totalTurns);
+        System.out.println("\nTurn: " + totalTurns);
+        System.out.println("Game board:");
         for (int i = 0; i < 8; i++) {
             for (int j = 0; j < 8; j++) {
                 System.out.print(board[i][j]);
@@ -315,6 +316,7 @@ public class Board {
         ArrayList<Move> legalMoves = getLegalMoves(currentPlayer);
         Move bestMove = legalMoves.get(0);
         int bestMoveScore = getMoveScore(legalMoves.get(0));
+        System.out.println("Legal moves for AI turn: ");
         for (Move m : legalMoves) {
             int moveScore = getMoveScore(m);
             System.out.println(m.toString() + " Score: " + moveScore);
