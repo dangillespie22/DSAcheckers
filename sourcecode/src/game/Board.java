@@ -9,8 +9,6 @@ public class Board {
     private ArrayList<Move> moveSequence;
     private int currentPlayer;
     private int totalTurns;
-    private int whiteTurns;
-    private int blackTurns;
     private int whitePieces;
     private int blackPieces;
     private int whiteKingPieces;
@@ -24,8 +22,6 @@ public class Board {
     public Board() {
         moveSequence = new ArrayList<>();
         totalTurns = 1;
-        whiteTurns = 0;
-        blackTurns = 0;
         whitePieces = 0;
         blackPieces = 0;
         whiteKingPieces = 0;
@@ -39,8 +35,6 @@ public class Board {
         this.board = board;
         this.currentPlayer = currentPlayer;
         this.totalTurns = totalTurns;
-        whiteTurns = 0;
-        blackTurns = 0;
         whitePieces = 0;
         blackPieces = 0;
         whiteKingPieces = 0;
@@ -64,10 +58,8 @@ public class Board {
 
         if (!move.isCapture() && state == 0) {
             if (currentPlayer == WHITE) {
-                whiteTurns++;
                 currentPlayer = BLACK;
             } else if (currentPlayer == BLACK) {
-                blackTurns++;
                 currentPlayer = WHITE;
             }
         }
@@ -141,7 +133,6 @@ public class Board {
     }
 
     private ArrayList<Move> getLegalMoves(int[][] boardState, int player) {
-
         ArrayList<Move> legalMoves = new ArrayList<>();
         int playerKing = player == WHITE ? WHITE_KING : BLACK_KING;
         for (int r = 0; r < 8; r++) {
@@ -204,19 +195,19 @@ public class Board {
         }
     }
 
-    private boolean isLegalMove(int[][] boardState, int player, int fromRow, int fromColumn, int middleRow, int middleColumn) {
+    private boolean isLegalMove(int[][] boardState, int player, int fromRow, int fromColumn, int targetRow, int targetColumn) {
 
-        if (middleRow < 0 || middleRow >= 8 || middleColumn < 0 || middleColumn >= 8)
+        if (targetRow < 0 || targetRow >= 8 || targetColumn < 0 || targetColumn >= 8) {
             return false;
-
-        if (boardState[middleRow][middleColumn] != EMPTY)
+        }
+        if (boardState[targetRow][targetColumn] != EMPTY) {
             return false;
-
+        }
         if (player == WHITE) {
-            return boardState[fromRow][fromColumn] != WHITE || middleRow <= fromRow;
+            return boardState[fromRow][fromColumn] != WHITE || targetRow <= fromRow;
         }
         else {
-            return boardState[fromRow][fromColumn] != BLACK || middleRow >= fromRow;
+            return boardState[fromRow][fromColumn] != BLACK || targetRow >= fromRow;
         }
     }
 
@@ -277,6 +268,7 @@ public class Board {
         int bestMoveScore = getMoveScore(legalMoves.get(0));
         for (Move m : legalMoves) {
             int moveScore = getMoveScore(m);
+            System.out.println(m.toString() + " Score: " + moveScore);
             if (moveScore > bestMoveScore) {
                 bestMoveScore = moveScore;
                 bestMove = m;
@@ -285,7 +277,7 @@ public class Board {
         return bestMove;
     }
 
-    public int getMoveScore(Move move) {
+    private int getMoveScore(Move move) {
         int actingPlayer = move.getPlayer();
         int opponent = actingPlayer == WHITE ? BLACK : WHITE;
         int moveScore = 0;

@@ -2,12 +2,12 @@ package game;
 
 public class Move {
 
-    int player;
+    private int player;
     int fromRow;
     int fromColumn;
     int targetRow;
     int targetColumn;
-    boolean isCapture;
+    private boolean isCapture;
 
     public Move (int player, int fromRow, int fromColumn, int targetRow, int targetColumn) {
         this.player = player;
@@ -38,7 +38,7 @@ public class Move {
 
     @Override
     public String toString () {
-       return (player == 1 ? "White - [" : "Black  - [") + fromRow + ", " + fromColumn + "] -> [" + targetRow + ", " + targetColumn + "]" +
+       return ("[") + fromRow + ", " + fromColumn + "] -> [" + targetRow + ", " + targetColumn + "]" +
                (isCapture ? " capture at [" + (targetRow+fromRow)/2 + ", " + (targetColumn+fromColumn)/2 + "]" : "");
     }
 }

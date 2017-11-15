@@ -13,7 +13,8 @@
 
 .layout {
     -fx-padding: 15 15 15 15;
-    -fx-background-color: linear-gradient(#FFA07A, #9E6341);
+    -fx-background-color: linear-gradient(to left, #9E6341, #FFA07A);
+
 }
 
 .turnText {
@@ -37,7 +38,7 @@
 .stateListWhite {
      -fx-font-family: verdana;
      -fx-font-weight: bold;
-     -fx-font-size: 12;
+     -fx-font-size: 15;
      -fx-alignment: top-left;
      -fx-fill: white;
  }
@@ -45,7 +46,7 @@
 .stateListBlack {
     -fx-font-family: verdana;
     -fx-font-weight: bold;
-    -fx-font-size: 12;
+    -fx-font-size: 15;
     -fx-alignment: top-left;
     -fx-fill: black;
     -fx-padding: 30;
@@ -56,7 +57,7 @@
     -fx-font-weight: bold;
     -fx-font-size: 18;
     -fx-alignment: top-left;
-    -fx-fill: linear-gradient(#8B4513, #C04513);
+    -fx-fill: linear-gradient(#E6E9F0, #EEF1F5);
     -fx-padding: 15;
 }
 

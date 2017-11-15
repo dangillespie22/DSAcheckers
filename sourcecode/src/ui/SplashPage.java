@@ -5,15 +5,16 @@ import game.Move;
 import javafx.application.Application;
 import javafx.geometry.*;
 import javafx.scene.*;
-import javafx.scene.control.Button;
+import javafx.scene.control.*;
 import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.*;
 import javafx.scene.text.Text;
 import javafx.stage.Stage;
 
+import java.io.PrintWriter;
+import java.io.StringWriter;
 import java.util.ArrayList;
-import java.util.Random;
 
 public class SplashPage extends Application {
     private static final int BOARD_DIM = 8;
@@ -26,7 +27,6 @@ public class SplashPage extends Application {
     private static final int BLACK_KING = 4;
     private static final int PvP = 1;
     private static final int PvAI = 2;
-    private static final int AIvAI = 3;
     private Circle selectedPiece = null;
     private Circle[] whitePieces = new Circle[12];
     private Circle[] blackPieces = new Circle[12];
@@ -81,7 +81,6 @@ public class SplashPage extends Application {
         if (gameStates.size() != 1) {
             gameStates.remove(gameStates.size()-1);
         }
-
         paintBoard();
     }
 
@@ -97,6 +96,7 @@ public class SplashPage extends Application {
         drawSquares();
         drawPieces();
         buildElements();
+        currentBoard.printBoard();
     }
 
     private void buildBoard() {
@@ -153,7 +153,15 @@ public class SplashPage extends Application {
     private void calculateWinner(int winner) {
         System.out.println("The winner is " + (winner == WHITE ? "WHITE" : "BLACK"));
         currentBoard.printGameDetails();
-        restartGame();
+        Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
+        alert.setTitle("Game Over!");
+        alert.setHeaderText("The winner is " + (winner == WHITE ? "WHITE" : "BLACK"));
+        alert.setContentText("If you wish to continue playing this game press close, otherwise press OK to clear the board");
+        alert.showAndWait().ifPresent(rs -> {
+            if (rs == ButtonType.OK) {
+                restartGame();
+            }
+        });
     }
 
     private void resetPieceColours() {
@@ -172,7 +180,6 @@ public class SplashPage extends Application {
         int state = currentBoard.makeMove(move);
         paintBoard();
         if (move.isCapture()) {
-            System.out.println("AI Captured " + (move.getPlayer() == WHITE ? "Black piece" : "White piece "));
             doAiTurn();
         }
         if (state != 0) {
