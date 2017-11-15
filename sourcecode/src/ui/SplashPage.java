@@ -12,8 +12,6 @@ import javafx.scene.shape.*;
 import javafx.scene.text.Text;
 import javafx.stage.Stage;
 
-import java.io.PrintWriter;
-import java.io.StringWriter;
 import java.util.ArrayList;
 
 public class SplashPage extends Application {
@@ -41,6 +39,9 @@ public class SplashPage extends Application {
         launch(args);
     }
 
+    /*
+    Initialises the board and UI elements
+     */
     public void start(Stage primaryStage) {
         gameType = PvAI;
         gameStates = new ArrayList<>();
@@ -54,6 +55,9 @@ public class SplashPage extends Application {
         primaryStage.show();
     }
 
+    /*
+    Resets a board to its initial state
+     */
     private void restartGame() {
         this.currentBoard = new Board();
         gameStates = new ArrayList<>();
@@ -61,29 +65,44 @@ public class SplashPage extends Application {
         paintBoard();
     }
 
+    /*
+    Restarts a game with a player vs player game type
+     */
     private void startPvP() {
         this.gameType = PvP;
         restartGame();
     }
 
+    /*
+    Restarts a game with a player vs AI game type
+     */
     private void startPvAI() {
         this.gameType = PvAI;
         restartGame();
     }
 
+    /*
+    Allows a player to undo a turn
+     */
     private void backOneTurn() {
-
+        /*
+        A board is only saved to the states list once a move has been carried out
+        Therefore for the first time a move is undone, the current state has to also be added to the second list
+         */
         if (gameStatesRedo.isEmpty()) {
             gameStatesRedo.add(currentBoard.cloneBoard());
         }
-        this.currentBoard = gameStates.get(gameStates.size()-1).cloneBoard();
+        this.currentBoard = gameStates.get(gameStates.size()-1).cloneBoard(); //sets the board to the new state
         gameStatesRedo.add(0, gameStates.get(gameStates.size()-1).cloneBoard());
         if (gameStates.size() != 1) {
-            gameStates.remove(gameStates.size()-1);
+            gameStates.remove(gameStates.size()-1); //Finally removes the state from the state list
         }
         paintBoard();
     }
 
+    /*
+    Allows a player to redo a turn
+     */
     private void forwardOneTurn() {
         gameStates.add(gameStatesRedo.get(0).cloneBoard());
         this.currentBoard = gameStatesRedo.get(0);
@@ -91,6 +110,9 @@ public class SplashPage extends Application {
         paintBoard();
     }
 
+    /*
+    Initialises all of the UI elements based on the new board state
+     */
     private void paintBoard() {
         buildBoard();
         drawSquares();
@@ -99,6 +121,9 @@ public class SplashPage extends Application {
         currentBoard.printBoard();
     }
 
+    /*
+    Builds the board UI element based on the checkers layout
+     */
     private void buildBoard() {
         for (int i = 0; i < BOARD_DIM; i++) {
             RowConstraints rc = new RowConstraints();
@@ -117,6 +142,10 @@ public class SplashPage extends Application {
         }
     }
 
+    /*
+    Draws the squares onto the board in the grid layout defined previously
+    Each square has an on-click function that serves functionally as the player input when making moves
+     */
     private void drawSquares() {
         Color[] sqColors = new Color[]{Color.LIGHTSALMON, Color.SADDLEBROWN};
         for (int i = 0; i < BOARD_DIM; i++) {
@@ -150,6 +179,10 @@ public class SplashPage extends Application {
         }
     }
 
+    /*
+    Handlers the end game logic, printing the entire game sequence and giving the option to the
+    player to continue playing the game by rewinding turns
+     */
     private void calculateWinner(int winner) {
         System.out.println("The winner is " + (winner == WHITE ? "WHITE" : "BLACK"));
         currentBoard.printGameDetails();
@@ -164,6 +197,9 @@ public class SplashPage extends Application {
         });
     }
 
+    /*
+    Used to reset game pieces once a game piece goes out of selected focus (when making a move)
+     */
     private void resetPieceColours() {
         for (Circle c : whitePieces) {
             c.setFill(WHITE_COLOUR);
@@ -173,13 +209,16 @@ public class SplashPage extends Application {
         }
     }
 
+    /*
+    Handles the logic when an AI makes a turn
+     */
     private void doAiTurn() {
-        Move move = currentBoard.calculateBestMove();
+        Move move = currentBoard.calculateBestMove(); //Evaluation function to calculate best move
         System.out.println("AI has selected: " + move.toString());
 
         int state = currentBoard.makeMove(move);
         paintBoard();
-        if (move.isCapture()) {
+        if (move.isCapture()) { //If move is a capture the player gets another turn
             doAiTurn();
         }
         if (state != 0) {
@@ -187,6 +226,9 @@ public class SplashPage extends Application {
         }
     }
 
+    /*
+    Draws the pieces onto the board based on the current state of the in-scope board
+     */
     private void drawPieces() {
         int whiteCounter = 0;
         int blackCounter = 0;
@@ -258,6 +300,10 @@ public class SplashPage extends Application {
         }
     }
 
+    /*
+    Initialises all of the UI elements that serves as inputs/information
+    Also sets all of the style sheet classes for UI elements
+     */
     private void buildElements() {
 
         layout.getChildren().removeAll();
